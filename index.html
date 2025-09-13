@@ -117,8 +117,8 @@
                         <div class="bg-gray-700 p-4 rounded-xl"><p class="text-sm text-rose-400">Calories Out</p><p class="text-2xl font-bold"><span id="history-calories-out">0</span> kcal</p></div>
                         <div class="bg-gray-700 p-4 rounded-xl"><p class="text-sm text-emerald-400">Protein</p><p class="text-2xl font-bold"><span id="history-protein">0</span> g</p></div>
                     </div>
-                    <h2 class="text-xl font-semibold mb-3 text-gray-300">Logged Meals</h2>
-                    <div id="history-meals-list" class="space-y-3"></div>
+                    <h2 class="text-xl font-semibold mb-3 text-gray-300">Daily Log</h2>
+                    <div id="history-log-list" class="space-y-3"></div>
                 </div>
             </div>
         </div>
@@ -160,7 +160,10 @@
      <div id="activity-modal" class="modal w-full max-w-sm">
         <div class="bg-gray-800 rounded-2xl shadow-lg p-6">
             <h2 class="text-2xl font-bold mb-4">Log Activity</h2>
-            <div><label for="activity-calories-out" class="block mb-2 text-sm font-medium text-gray-300">Calories Burned (kcal)</label><input type="number" id="activity-calories-out" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., 300"></div>
+             <div class="space-y-4">
+                <div><label for="activity-description" class="block mb-2 text-sm font-medium text-gray-300">Description</label><input type="text" id="activity-description" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., Morning Run"></div>
+                <div><label for="activity-calories-out" class="block mb-2 text-sm font-medium text-gray-300">Calories Burned (kcal)</label><input type="number" id="activity-calories-out" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., 300"></div>
+            </div>
             <div class="flex justify-end gap-3 mt-6">
                  <button onclick="hideActivityModal()" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium transition">Cancel</button>
                 <button id="save-activity-btn" class="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-sm font-medium transition">Save Activity</button>
@@ -222,7 +225,8 @@
         let currentMealCategory = '';
         let goals = { caloriesIn: 2000, caloriesOut: 300, protein: 120 };
         let allSavedMeals = [];
-        let dailyLogData = { loggedMeals: [], caloriesOut: 0 };
+        let dailyLogData = { loggedMeals: [], loggedActivities: [] };
+        let currentlyViewedDate = getTodayDateString();
         let isFirebaseReady = false;
         
         // =================================================================================
@@ -233,13 +237,12 @@
         // 3. Create a Firestore database in Production Mode and set Security Rules.
         // 4. Get your web app config object and paste it here, replacing this placeholder.
         const firebaseConfig = {
-    apiKey: "AIzaSyB4qvUJZZJXDLntYXAtfxaoOCb3jnDo2Yk",
-    authDomain: "tracker-42811.firebaseapp.com",
-    projectId: "tracker-42811",
-    storageBucket: "tracker-42811.firebasestorage.app",
-    messagingSenderId: "985245635128",
-    appId: "1:985245635128:web:1b37ff6f84ba9dda3b8ccd",
-    measurementId: "G-74BBTD6JZY"
+          apiKey: "YOUR_API_KEY", // <--- REPLACE
+          authDomain: "YOUR_AUTH_DOMAIN", // <--- REPLACE
+          projectId: "YOUR_PROJECT_ID", // <--- REPLACE
+          storageBucket: "YOUR_STORAGE_BUCKET", // <--- REPLACE
+          messagingSenderId: "YOUR_MESSAGING_SENDER_ID", // <--- REPLACE
+          appId: "YOUR_APP_ID" // <--- REPLACE
         };
         // =================================================================================
 
@@ -284,7 +287,7 @@
             const todayId = getTodayDateString();
             const logRef = doc(db, `artifacts/${appId}/users/${userId}/dailyLogs`, todayId);
             onSnapshot(logRef, (docSnap) => {
-                dailyLogData = docSnap.exists() ? docSnap.data() : { loggedMeals: [], caloriesOut: 0 };
+                dailyLogData = docSnap.exists() ? docSnap.data() : { loggedMeals: [], loggedActivities: [] };
                 updateDashboardUI();
             });
             const mealsQuery = query(collection(db, `artifacts/${appId}/users/${userId}/meals`));
@@ -297,48 +300,88 @@
         
         // --- UI RENDERING & UPDATES ---
         function renderHistoryData(data) {
-            const loggedMeals = data.loggedMeals || [];
-            const totals = loggedMeals.reduce((acc, meal) => {
-                acc.caloriesIn += meal.calories || 0;
-                acc.protein += meal.protein || 0;
+            const loggedMeals = (data.loggedMeals || []).map(m => ({...m, type: 'meal'}));
+            const loggedActivities = (data.loggedActivities || []).map(a => ({...a, type: 'activity'}));
+            
+            const combinedLog = [...loggedMeals, ...loggedActivities];
+            // Convert Firestore Timestamps to JS Dates for sorting
+            combinedLog.forEach(item => {
+                if (item.timestamp && item.timestamp.seconds) {
+                    item.jsDate = new Date(item.timestamp.seconds * 1000);
+                } else {
+                    item.jsDate = new Date(); // Fallback for older data
+                }
+            });
+            combinedLog.sort((a, b) => b.jsDate - a.jsDate);
+
+            // Calculate totals
+            const totals = combinedLog.reduce((acc, item) => {
+                if(item.type === 'meal'){
+                    acc.caloriesIn += item.calories || 0;
+                    acc.protein += item.protein || 0;
+                } else if(item.type === 'activity') {
+                    acc.caloriesOut += item.calories || 0;
+                }
                 return acc;
-            }, { caloriesIn: 0, protein: 0 });
+            }, { caloriesIn: 0, protein: 0, caloriesOut: 0 });
+
             document.getElementById('history-calories-in').textContent = totals.caloriesIn;
-            document.getElementById('history-calories-out').textContent = data.caloriesOut || 0;
+            document.getElementById('history-calories-out').textContent = totals.caloriesOut;
             document.getElementById('history-protein').textContent = totals.protein;
-            const mealsListEl = document.getElementById('history-meals-list');
-            if (loggedMeals.length === 0) {
-                mealsListEl.innerHTML = '<p class="text-gray-500 text-center py-4">No meals logged.</p>';
+
+            const logListEl = document.getElementById('history-log-list');
+            if (combinedLog.length === 0) {
+                logListEl.innerHTML = '<p class="text-gray-500 text-center py-4">No entries for this day.</p>';
                 return;
             }
-            const groupedMeals = loggedMeals.reduce((acc, meal) => {
-                const category = meal.category || 'Uncategorized';
-                if (!acc[category]) acc[category] = [];
-                acc[category].push(meal);
-                return acc;
-            }, {});
-            let mealHtml = '';
-            for (const category in groupedMeals) {
-                mealHtml += `<h3 class="font-semibold text-lg text-indigo-300 mt-4 first:mt-0">${category}</h3>`;
-                groupedMeals[category].forEach(meal => {
-                    mealHtml += `<div class="bg-gray-700 p-3 rounded-lg flex justify-between items-center"><div><p class="font-medium">${meal.name}</p><p class="text-xs text-gray-400">${meal.calories} kcal &bull; ${meal.protein}g protein</p></div></div>`;
-                });
-            }
-            mealsListEl.innerHTML = mealHtml;
+            
+            logListEl.innerHTML = combinedLog.map(item => {
+                const time = item.jsDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                if (item.type === 'meal') {
+                    return `
+                        <div class="bg-gray-700 p-3 rounded-lg flex justify-between items-center">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xl">🍳</span>
+                                <div>
+                                    <p class="font-medium">${item.name}</p>
+                                    <p class="text-xs text-gray-400">${item.calories} kcal &bull; ${item.protein}g protein &bull; ${time}</p>
+                                </div>
+                            </div>
+                            <button onclick="handleDeleteLogItem('${item.id}', 'meal')" class="p-2 rounded-full hover:bg-gray-600 transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>
+                            </button>
+                        </div>`;
+                } else { // Activity
+                     return `
+                        <div class="bg-gray-700 p-3 rounded-lg flex justify-between items-center">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xl">🏃</span>
+                                <div>
+                                    <p class="font-medium">${item.description}</p>
+                                    <p class="text-xs text-gray-400">${item.calories} kcal burned &bull; ${time}</p>
+                                </div>
+                            </div>
+                            <button onclick="handleDeleteLogItem('${item.id}', 'activity')" class="p-2 rounded-full hover:bg-gray-600 transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>
+                            </button>
+                        </div>`;
+                }
+            }).join('');
         }
+
         function updateDashboardUI() {
-            const totals = dailyLogData.loggedMeals.reduce((acc, meal) => {
-                acc.caloriesIn += meal.calories || 0;
-                acc.protein += meal.protein || 0;
-                return acc;
-            }, { caloriesIn: 0, protein: 0 });
-            const caloriesOut = dailyLogData.caloriesOut || 0;
-            document.getElementById('calories-in-value').textContent = totals.caloriesIn;
-            document.getElementById('protein-value').textContent = totals.protein;
-            document.getElementById('calories-out-value').textContent = caloriesOut;
-            const calInPercent = goals.caloriesIn > 0 ? Math.min((totals.caloriesIn / goals.caloriesIn) * 100, 100) : 0;
-            const proteinPercent = goals.protein > 0 ? Math.min((totals.protein / goals.protein) * 100, 100) : 0;
-            const calOutPercent = goals.caloriesOut > 0 ? Math.min((caloriesOut / goals.caloriesOut) * 100, 100) : 0;
+            const totalCaloriesIn = (dailyLogData.loggedMeals || []).reduce((acc, meal) => acc + (meal.calories || 0), 0);
+            const totalProtein = (dailyLogData.loggedMeals || []).reduce((acc, meal) => acc + (meal.protein || 0), 0);
+            const totalCaloriesOut = (dailyLogData.loggedActivities || []).reduce((acc, activity) => acc + (activity.calories || 0), 0);
+
+            document.getElementById('calories-in-value').textContent = totalCaloriesIn;
+            document.getElementById('protein-value').textContent = totalProtein;
+            document.getElementById('calories-out-value').textContent = totalCaloriesOut;
+
+            const calInPercent = goals.caloriesIn > 0 ? Math.min((totalCaloriesIn / goals.caloriesIn) * 100, 100) : 0;
+            const proteinPercent = goals.protein > 0 ? Math.min((totalProtein / goals.protein) * 100, 100) : 0;
+            const calOutPercent = goals.caloriesOut > 0 ? Math.min((totalCaloriesOut / goals.caloriesOut) * 100, 100) : 0;
+
             document.getElementById('calories-in-circle').style.setProperty('--progress', `${calInPercent}%`);
             document.getElementById('protein-circle').style.setProperty('--progress', `${proteinPercent}%`);
             document.getElementById('calories-out-circle').style.setProperty('--progress', `${calOutPercent}%`);
@@ -408,27 +451,36 @@
         async function logMeal(mealData) {
             const todayId = getTodayDateString();
             const logRef = doc(db, `artifacts/${appId}/users/${userId}/dailyLogs`, todayId);
-            const mealToLog = { ...mealData, category: currentMealCategory, timestamp: new Date() };
+            const mealToLog = { ...mealData, id: crypto.randomUUID(), timestamp: new Date() };
             const docSnap = await getDoc(logRef);
             if (docSnap.exists()) {
                 const updatedMeals = [...(docSnap.data().loggedMeals || []), mealToLog];
                 await updateDoc(logRef, { loggedMeals: updatedMeals });
             } else {
-                await setDoc(logRef, { loggedMeals: [mealToLog], caloriesOut: 0 });
+                await setDoc(logRef, { loggedMeals: [mealToLog], loggedActivities: [] });
             }
             showToast(`${mealData.name} logged!`, 'success');
             showPage('page-log-meal-selection');
         }
         async function handleSaveActivity() {
             const caloriesOutValue = parseInt(document.getElementById('activity-calories-out').value) || 0;
-            if (caloriesOutValue < 0) { showToast("Cannot be negative.", "error"); return; }
+            const description = document.getElementById('activity-description').value.trim() || 'Activity';
+            if (caloriesOutValue <= 0) { showToast("Calories must be positive.", "error"); return; }
             const todayId = getTodayDateString();
             const logRef = doc(db, `artifacts/${appId}/users/${userId}/dailyLogs`, todayId);
-            await setDoc(logRef, { caloriesOut: caloriesOutValue }, { merge: true });
+            const activityToLog = { id: crypto.randomUUID(), description, calories: caloriesOutValue, timestamp: new Date() };
+             const docSnap = await getDoc(logRef);
+            if (docSnap.exists()) {
+                const updatedActivities = [...(docSnap.data().loggedActivities || []), activityToLog];
+                await updateDoc(logRef, { loggedActivities: updatedActivities });
+            } else {
+                await setDoc(logRef, { loggedMeals: [], loggedActivities: [activityToLog] });
+            }
             showToast("Activity logged!", "success");
             hideActivityModal();
         }
         async function fetchAndRenderHistory(dateString) {
+            currentlyViewedDate = dateString; // Store the date for deleting items
             const loadingEl = document.getElementById('history-loading');
             const noDataEl = document.getElementById('history-no-data');
             const contentEl = document.getElementById('history-content');
@@ -439,7 +491,7 @@
             const logRef = doc(db, `artifacts/${appId}/users/${userId}/dailyLogs`, dateString);
             try {
                 const docSnap = await getDoc(logRef);
-                if (docSnap.exists()) { renderHistoryData(docSnap.data()); contentEl.style.display = 'block'; } else { noDataEl.style.display = 'block'; }
+                if (docSnap.exists()) { renderHistoryData(docSnap.data()); contentEl.style.display = 'block'; } else { noDataEl.style.display = 'block'; renderHistoryData({}); }
             } catch (error) {
                 console.error("Error fetching history:", error);
                 showToast("Failed to load history.", "error");
@@ -470,6 +522,23 @@
             showToast("Meal deleted from library.", "success");
             hideConfirmDeleteModal();
         }
+        
+        window.handleDeleteLogItem = async (itemId, itemType) => {
+            const logRef = doc(db, `artifacts/${appId}/users/${userId}/dailyLogs`, currentlyViewedDate);
+            const docSnap = await getDoc(logRef);
+            if(docSnap.exists()){
+                const data = docSnap.data();
+                if(itemType === 'meal'){
+                    const updatedMeals = (data.loggedMeals || []).filter(m => m.id !== itemId);
+                    await updateDoc(logRef, { loggedMeals: updatedMeals });
+                } else if(itemType === 'activity') {
+                    const updatedActivities = (data.loggedActivities || []).filter(a => a.id !== itemId);
+                    await updateDoc(logRef, { loggedActivities: updatedActivities });
+                }
+                showToast("Log entry removed!", "success");
+                fetchAndRenderHistory(currentlyViewedDate); // Refresh history view
+            }
+        }
 
         // --- NAVIGATION & UTILS ---
         window.showPage = (pageId) => {
@@ -491,7 +560,12 @@
             showPage('page-meal-logging');
             renderSavedMeals();
         };
-        window.showActivityModal = () => { document.getElementById('activity-modal-backdrop').classList.add('active'); document.getElementById('activity-modal').classList.add('active'); };
+        window.showActivityModal = () => { 
+            document.getElementById('activity-description').value = '';
+            document.getElementById('activity-calories-out').value = '';
+            document.getElementById('activity-modal-backdrop').classList.add('active');
+            document.getElementById('activity-modal').classList.add('active');
+        };
         window.hideActivityModal = () => { document.getElementById('activity-modal-backdrop').classList.remove('active'); document.getElementById('activity-modal').classList.remove('active'); };
         
         window.showEditMealModal = (meal) => {
