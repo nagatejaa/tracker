@@ -168,6 +168,38 @@
         </div>
      </div>
 
+     <!-- EDIT MEAL MODAL -->
+     <div id="edit-meal-modal-backdrop" class="modal-backdrop"></div>
+     <div id="edit-meal-modal" class="modal w-full max-w-sm">
+        <div class="bg-gray-800 rounded-2xl shadow-lg p-6">
+            <h2 class="text-2xl font-bold mb-4">Edit Meal</h2>
+            <input type="hidden" id="edit-meal-id">
+            <div class="space-y-4">
+                <div><label for="edit-meal-name" class="block mb-2 text-sm font-medium text-gray-300">Meal Name</label><input type="text" id="edit-meal-name" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                <div><label for="edit-meal-calories" class="block mb-2 text-sm font-medium text-gray-300">Calories (kcal)</label><input type="number" id="edit-meal-calories" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                <div><label for="edit-meal-protein" class="block mb-2 text-sm font-medium text-gray-300">Protein (g)</label><input type="number" id="edit-meal-protein" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                <div><label for="edit-meal-carbs" class="block mb-2 text-sm font-medium text-gray-300">Carbohydrates (g)</label><input type="number" id="edit-meal-carbs" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+            </div>
+            <div class="flex justify-end gap-3 mt-6">
+                 <button onclick="hideEditMealModal()" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium transition">Cancel</button>
+                <button id="save-updated-meal-btn" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition">Save Changes</button>
+            </div>
+        </div>
+     </div>
+
+     <!-- CONFIRM DELETE MODAL -->
+     <div id="confirm-delete-modal-backdrop" class="modal-backdrop"></div>
+     <div id="confirm-delete-modal" class="modal w-full max-w-sm">
+        <div class="bg-gray-800 rounded-2xl shadow-lg p-6">
+            <h2 class="text-2xl font-bold mb-2">Are you sure?</h2>
+            <p id="confirm-delete-message" class="text-gray-400 mb-6">This action cannot be undone.</p>
+            <div class="flex justify-end gap-3 mt-6">
+                <button onclick="hideConfirmDeleteModal()" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium transition">Cancel</button>
+                <button id="confirm-delete-btn" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-medium transition">Delete</button>
+            </div>
+        </div>
+     </div>
+
     <!-- Custom Toast Notification -->
     <div id="toast" class="fixed bottom-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-md transition-all duration-300 opacity-0 transform translate-y-4"><p id="toast-message"></p></div>
 
@@ -175,7 +207,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, query, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, query, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const getTodayDateString = () => {
             const today = new Date();
@@ -198,19 +230,17 @@
         // =================================================================================
         // 1. Create a new, free Firebase project.
         // 2. Enable Anonymous Authentication.
-        // 3. Create a Firestore database in Production Mode.
+        // 3. Create a Firestore database in Production Mode and set Security Rules.
         // 4. Get your web app config object and paste it here, replacing this placeholder.
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyB4qvUJZZJXDLntYXAtfxaoOCb3jnDo2Yk",
-  authDomain: "tracker-42811.firebaseapp.com",
-  projectId: "tracker-42811",
-  storageBucket: "tracker-42811.firebasestorage.app",
-  messagingSenderId: "985245635128",
-  appId: "1:985245635128:web:1b37ff6f84ba9dda3b8ccd",
-  measurementId: "G-74BBTD6JZY"
-};
+        const firebaseConfig = {
+    apiKey: "AIzaSyB4qvUJZZJXDLntYXAtfxaoOCb3jnDo2Yk",
+    authDomain: "tracker-42811.firebaseapp.com",
+    projectId: "tracker-42811",
+    storageBucket: "tracker-42811.firebasestorage.app",
+    messagingSenderId: "985245635128",
+    appId: "1:985245635128:web:1b37ff6f84ba9dda3b8ccd",
+    measurementId: "G-74BBTD6JZY"
+        };
         // =================================================================================
 
         const appId = 'health-tracker-public'; // Use a consistent ID for public deployment
@@ -238,7 +268,7 @@ const firebaseConfig = {
                 });
             } catch (error) {
                 console.error("Firebase initialization failed:", error);
-                document.getElementById('loading-spinner').innerHTML = `<div class="text-center text-red-400 p-4 max-w-sm"><strong>Database Connection Failed:</strong><br>Please double-check that you have pasted the correct firebaseConfig and enabled Anonymous Authentication in your Firebase project.</div>`;
+                document.getElementById('loading-spinner').innerHTML = `<div class="text-center text-red-400 p-4 max-w-sm"><strong>Database Connection Failed:</strong><br>Please double-check your firebaseConfig and Firebase project settings (Authentication, Firestore Rules).</div>`;
             }
         }
         
@@ -333,8 +363,27 @@ const firebaseConfig = {
             filteredMeals.forEach(meal => {
                 const mealEl = document.createElement('div');
                 mealEl.className = 'bg-gray-700 p-4 rounded-lg flex justify-between items-center';
-                mealEl.innerHTML = `<div><p class="font-semibold">${meal.name}</p><p class="text-sm text-gray-400">${meal.calories} kcal &bull; ${meal.protein}g protein</p></div><button class="bg-indigo-600 p-2 rounded-full hover:bg-indigo-500 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg></button>`;
-                mealEl.querySelector('button').onclick = () => logMeal(meal);
+                mealEl.innerHTML = `
+                    <div class="flex-grow">
+                        <p class="font-semibold">${meal.name}</p>
+                        <p class="text-sm text-gray-400">${meal.calories} kcal &bull; ${meal.protein}g protein</p>
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <button class="bg-indigo-600 p-2 rounded-full hover:bg-indigo-500 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                        </button>
+                        <button class="p-2 rounded-full hover:bg-gray-600 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                        </button>
+                        <button class="p-2 rounded-full hover:bg-gray-600 transition">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>
+                        </button>
+                    </div>`;
+                mealEl.querySelector('button.bg-indigo-600').onclick = () => logMeal(meal);
+                const editButton = mealEl.querySelectorAll('button')[1];
+                const deleteButton = mealEl.querySelectorAll('button')[2];
+                editButton.onclick = () => showEditMealModal(meal);
+                deleteButton.onclick = () => showConfirmDeleteModal(meal.id, meal.name);
                 listEl.appendChild(mealEl);
             });
         }
@@ -400,6 +449,28 @@ const firebaseConfig = {
             }
         }
 
+        async function handleUpdateMeal() {
+            const mealId = document.getElementById('edit-meal-id').value;
+            const updatedMeal = {
+                name: document.getElementById('edit-meal-name').value.trim(),
+                calories: parseInt(document.getElementById('edit-meal-calories').value) || 0,
+                protein: parseInt(document.getElementById('edit-meal-protein').value) || 0,
+                carbs: parseInt(document.getElementById('edit-meal-carbs').value) || 0
+            };
+            if (!updatedMeal.name) { showToast('Meal name required.', 'error'); return; }
+            const mealRef = doc(db, `artifacts/${appId}/users/${userId}/meals`, mealId);
+            await updateDoc(mealRef, updatedMeal);
+            showToast("Meal updated!", "success");
+            hideEditMealModal();
+        }
+
+        async function deleteMeal(mealId) {
+            const mealRef = doc(db, `artifacts/${appId}/users/${userId}/meals`, mealId);
+            await deleteDoc(mealRef);
+            showToast("Meal deleted from library.", "success");
+            hideConfirmDeleteModal();
+        }
+
         // --- NAVIGATION & UTILS ---
         window.showPage = (pageId) => {
             document.querySelectorAll('#app-container .page').forEach(p => p.classList.remove('active'));
@@ -422,6 +493,32 @@ const firebaseConfig = {
         };
         window.showActivityModal = () => { document.getElementById('activity-modal-backdrop').classList.add('active'); document.getElementById('activity-modal').classList.add('active'); };
         window.hideActivityModal = () => { document.getElementById('activity-modal-backdrop').classList.remove('active'); document.getElementById('activity-modal').classList.remove('active'); };
+        
+        window.showEditMealModal = (meal) => {
+            document.getElementById('edit-meal-id').value = meal.id;
+            document.getElementById('edit-meal-name').value = meal.name;
+            document.getElementById('edit-meal-calories').value = meal.calories;
+            document.getElementById('edit-meal-protein').value = meal.protein;
+            document.getElementById('edit-meal-carbs').value = meal.carbs;
+            document.getElementById('edit-meal-modal-backdrop').classList.add('active');
+            document.getElementById('edit-meal-modal').classList.add('active');
+        };
+        window.hideEditMealModal = () => {
+            document.getElementById('edit-meal-modal-backdrop').classList.remove('active');
+            document.getElementById('edit-meal-modal').classList.remove('active');
+        };
+
+        window.showConfirmDeleteModal = (mealId, mealName) => {
+            document.getElementById('confirm-delete-message').textContent = `Are you sure you want to permanently delete "${mealName}"? This action cannot be undone.`
+            document.getElementById('confirm-delete-btn').onclick = () => deleteMeal(mealId);
+            document.getElementById('confirm-delete-modal-backdrop').classList.add('active');
+            document.getElementById('confirm-delete-modal').classList.add('active');
+        };
+        window.hideConfirmDeleteModal = () => {
+            document.getElementById('confirm-delete-modal-backdrop').classList.remove('active');
+            document.getElementById('confirm-delete-modal').classList.remove('active');
+        };
+
         let toastTimer;
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
@@ -509,6 +606,7 @@ const firebaseConfig = {
             document.getElementById('save-activity-btn').addEventListener('click', handleSaveActivity);
             document.getElementById('save-new-pin-btn').addEventListener('click', handleChangePin);
             document.getElementById('history-date-picker').addEventListener('change', (e) => fetchAndRenderHistory(e.target.value));
+            document.getElementById('save-updated-meal-btn').addEventListener('click', handleUpdateMeal);
         });
 
         // Make functions globally accessible for inline onclick handlers
