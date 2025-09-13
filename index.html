@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .progress-circle {
+            background: radial-gradient(closest-side, #111827 85%, transparent 86% 100%),
+                        conic-gradient(var(--tw-gradient-from) 0% var(--progress, 0%), #374151 var(--progress, 0%) 100%);
+        }
+        .page { display: none; }
+        .page.active { display: block; }
+        .modal-backdrop {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); z-index: 40; opacity: 0; transition: opacity 0.3s ease-in-out;
+        }
+        .modal {
+            display: none; position: fixed; top: 50%; left: 50%; z-index: 50;
+            transform: translate(-50%, -45%); opacity: 0; transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        .modal-backdrop.active, .modal.active { display: block; opacity: 1; }
+        .modal.active { transform: translate(-50%, -50%); }
+        #pin-dots span { transition: all 0.2s; }
+        .animate-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white antialiased">
+    <div id="loading-spinner" class="fixed inset-0 bg-gray-900 flex justify-center items-center z-50">
+        <div class="animate-spin rounded-full h-20 w-20 border-b-2 border-indigo-400"></div>
+    </div>
+    
+    <!-- PIN/LOGIN PAGE -->
+     <div id="page-login" class="page">
+        <div class="flex flex-col items-center justify-center min-h-screen p-4">
+            <div class="w-full max-w-xs text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-indigo-400 mb-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" /></svg>
+                <h1 id="pin-title" class="text-2xl font-bold text-white mb-2">Enter PIN</h1>
+                <p id="pin-subtitle" class="text-gray-400 mb-6">Enter your 4-digit PIN to continue.</p>
+                <div id="pin-dots" class="flex justify-center space-x-4 mb-6">
+                    <span class="h-4 w-4 bg-gray-700 rounded-full"></span><span class="h-4 w-4 bg-gray-700 rounded-full"></span><span class="h-4 w-4 bg-gray-700 rounded-full"></span><span class="h-4 w-4 bg-gray-700 rounded-full"></span>
+                </div>
+                <div id="keypad" class="grid grid-cols-3 gap-4"></div>
+                 <p class="text-xs text-gray-600 mt-6">This PIN protects the app on this device only.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-container" class="max-w-xl mx-auto p-4 md:p-6 min-h-screen hidden">
+
+        <!-- DASHBOARD PAGE -->
+        <div id="page-dashboard" class="page">
+            <header class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-100">Today's Stats</h1>
+                    <p id="today-date" class="text-indigo-400"></p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="showHistoryPage()" class="text-gray-400 hover:text-white transition p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></button>
+                    <button onclick="showPage('page-goals')" class="text-gray-400 hover:text-white transition p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg></button>
+                </div>
+            </header>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 text-center">
+                <div class="bg-gray-800 p-4 rounded-2xl flex flex-col items-center justify-center"><div id="calories-in-circle" class="progress-circle from-sky-400 w-32 h-32 rounded-full flex items-center justify-center transition-all duration-500"><div class="text-center"><span id="calories-in-value" class="text-2xl font-bold">0</span><span class="text-xs text-gray-400 block">kcal</span></div></div><p class="mt-3 font-medium">Calories In</p><p id="calories-in-goal" class="text-sm text-gray-500">Goal: 0</p></div>
+                <div class="bg-gray-800 p-4 rounded-2xl flex flex-col items-center justify-center"><div id="calories-out-circle" class="progress-circle from-rose-500 w-32 h-32 rounded-full flex items-center justify-center transition-all duration-500"><div class="text-center"><span id="calories-out-value" class="text-2xl font-bold">0</span><span class="text-xs text-gray-400 block">kcal</span></div></div><p class="mt-3 font-medium">Calories Out</p><p id="calories-out-goal" class="text-sm text-gray-500">Goal: 0</p></div>
+                <div class="bg-gray-800 p-4 rounded-2xl flex flex-col items-center justify-center"><div id="protein-circle" class="progress-circle from-emerald-400 w-32 h-32 rounded-full flex items-center justify-center transition-all duration-500"><div class="text-center"><span id="protein-value" class="text-2xl font-bold">0</span><span class="text-xs text-gray-400 block">grams</span></div></div><p class="mt-3 font-medium">Protein</p><p id="protein-goal" class="text-sm text-gray-500">Goal: 0</p></div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="showPage('page-log-meal-selection')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-4 rounded-xl shadow-lg transition-transform transform hover:scale-105 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.993.883L4 8v10a1 1 0 00.883.993L5 19h10a1 1 0 00.993-.883L16 18V8a1 1 0 00-.883-.993L15 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4z" /></svg>Log Meal</button>
+                <button onclick="showActivityModal()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-4 px-4 rounded-xl shadow-lg transition-transform transform hover:scale-105 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>Log Activity</button>
+            </div>
+        </div>
+
+        <!-- GOALS PAGE -->
+        <div id="page-goals" class="page">
+            <header class="flex items-center mb-8"><button onclick="showPage('page-dashboard')" class="mr-4 p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-3xl font-bold text-gray-100">Set Daily Goals</h1></header>
+            <div class="space-y-6 bg-gray-800 p-6 rounded-2xl">
+                <div><label for="goal-calories-in" class="block mb-2 text-sm font-medium text-gray-300">Daily Calorie Intake Goal</label><input type="number" id="goal-calories-in" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., 2000"></div>
+                <div><label for="goal-calories-out" class="block mb-2 text-sm font-medium text-gray-300">Daily Calorie Burn Goal</label><input type="number" id="goal-calories-out" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., 500"></div>
+                <div><label for="goal-protein" class="block mb-2 text-sm font-medium text-gray-300">Daily Protein Intake Goal (grams)</label><input type="number" id="goal-protein" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., 150"></div>
+                <button id="save-goals-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition-transform transform hover:scale-105">Save Goals</button>
+                <button onclick="showPage('page-change-pin')" class="w-full mt-4 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-xl transition-transform transform hover:scale-105">Change PIN</button>
+            </div>
+        </div>
+        
+        <!-- CHANGE PIN PAGE -->
+        <div id="page-change-pin" class="page">
+            <header class="flex items-center mb-8"><button onclick="showPage('page-goals')" class="mr-4 p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-3xl font-bold text-gray-100">Change PIN</h1></header>
+            <div class="space-y-4 bg-gray-800 p-6 rounded-2xl">
+                <div><label for="current-pin" class="block mb-2 text-sm font-medium text-gray-300">Current PIN</label><input type="password" id="current-pin" inputmode="numeric" maxlength="4" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="****"></div>
+                <div><label for="new-pin" class="block mb-2 text-sm font-medium text-gray-300">New PIN</label><input type="password" id="new-pin" inputmode="numeric" maxlength="4" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="****"></div>
+                <div><label for="confirm-new-pin" class="block mb-2 text-sm font-medium text-gray-300">Confirm New PIN</label><input type="password" id="confirm-new-pin" inputmode="numeric" maxlength="4" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="****"></div>
+                <button id="save-new-pin-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition-transform transform hover:scale-105">Save New PIN</button>
+            </div>
+        </div>
+
+        <!-- HISTORY PAGE -->
+        <div id="page-history" class="page">
+            <header class="flex items-center mb-6"><button onclick="showPage('page-dashboard')" class="mr-4 p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-3xl font-bold text-gray-100">History</h1></header>
+            <div class="bg-gray-800 p-4 rounded-2xl mb-6"><label for="history-date-picker" class="block text-sm font-medium text-gray-400 mb-2">Select a date to view</label><input type="date" id="history-date-picker" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+            <div id="history-data-container">
+                <div id="history-loading" class="text-center py-8 text-gray-500 hidden"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-400 mx-auto"></div><p class="mt-2">Loading data...</p></div>
+                <div id="history-no-data" class="text-center py-8 hidden"><svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg><p class="mt-4 text-gray-400">No data logged for this day.</p></div>
+                <div id="history-content" class="hidden">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 text-center">
+                        <div class="bg-gray-700 p-4 rounded-xl"><p class="text-sm text-sky-400">Calories In</p><p class="text-2xl font-bold"><span id="history-calories-in">0</span> kcal</p></div>
+                        <div class="bg-gray-700 p-4 rounded-xl"><p class="text-sm text-rose-400">Calories Out</p><p class="text-2xl font-bold"><span id="history-calories-out">0</span> kcal</p></div>
+                        <div class="bg-gray-700 p-4 rounded-xl"><p class="text-sm text-emerald-400">Protein</p><p class="text-2xl font-bold"><span id="history-protein">0</span> g</p></div>
+                    </div>
+                    <h2 class="text-xl font-semibold mb-3 text-gray-300">Logged Meals</h2>
+                    <div id="history-meals-list" class="space-y-3"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOG MEAL SELECTION PAGE -->
+        <div id="page-log-meal-selection" class="page">
+             <header class="flex items-center mb-8"><button onclick="showPage('page-dashboard')" class="mr-4 p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-3xl font-bold text-gray-100">Log a Meal</h1></header>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="showMealLoggingPage('Breakfast')" class="bg-gray-800 p-6 rounded-2xl text-center hover:bg-gray-700 transition"><span class="text-4xl">🍳</span><span class="block mt-2 font-semibold">Breakfast</span></button>
+                <button onclick="showMealLoggingPage('Lunch')" class="bg-gray-800 p-6 rounded-2xl text-center hover:bg-gray-700 transition"><span class="text-4xl">🥗</span><span class="block mt-2 font-semibold">Lunch</span></button>
+                <button onclick="showMealLoggingPage('Dinner')" class="bg-gray-800 p-6 rounded-2xl text-center hover:bg-gray-700 transition"><span class="text-4xl">🍲</span><span class="block mt-2 font-semibold">Dinner</span></button>
+                <button onclick="showMealLoggingPage('Snacks')" class="bg-gray-800 p-6 rounded-2xl text-center hover:bg-gray-700 transition"><span class="text-4xl">🍎</span><span class="block mt-2 font-semibold">Snacks</span></button>
+            </div>
+        </div>
+
+        <!-- MEAL LOGGING PAGE -->
+        <div id="page-meal-logging" class="page">
+             <header class="flex items-center mb-6"><button onclick="showPage('page-log-meal-selection')" class="mr-4 p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-3xl font-bold text-gray-100">Log <span id="meal-category-title"></span></h1></header>
+            <div class="mb-4"><input type="text" id="search-meal-input" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="Search saved meals..."></div>
+            <div id="saved-meals-list" class="space-y-3 max-h-[50vh] overflow-y-auto pr-2"></div>
+            <button onclick="showPage('page-add-new-meal')" class="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition-transform transform hover:scale-105">Add New Meal</button>
+        </div>
+
+        <!-- ADD MEAL PAGE -->
+        <div id="page-add-new-meal" class="page">
+            <header class="flex items-center mb-8"><button onclick="showPage('page-meal-logging')" class="mr-4 p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-3xl font-bold text-gray-100">Add a New Meal</h1></header>
+            <div class="space-y-4 bg-gray-800 p-6 rounded-2xl">
+                <div><label for="new-meal-name" class="block mb-2 text-sm font-medium text-gray-300">Meal Name</label><input type="text" id="new-meal-name" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., Grilled Chicken Salad"></div>
+                <div><label for="new-meal-calories" class="block mb-2 text-sm font-medium text-gray-300">Calories (kcal)</label><input type="number" id="new-meal-calories" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                <div><label for="new-meal-protein" class="block mb-2 text-sm font-medium text-gray-300">Protein (g)</label><input type="number" id="new-meal-protein" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                <div><label for="new-meal-carbs" class="block mb-2 text-sm font-medium text-gray-300">Carbohydrates (g)</label><input type="number" id="new-meal-carbs" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                <button id="save-new-meal-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition-transform transform hover:scale-105">Save Meal to Library</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ACTIVITY LOG MODAL -->
+     <div id="activity-modal-backdrop" class="modal-backdrop"></div>
+     <div id="activity-modal" class="modal w-full max-w-sm">
+        <div class="bg-gray-800 rounded-2xl shadow-lg p-6">
+            <h2 class="text-2xl font-bold mb-4">Log Activity</h2>
+            <div><label for="activity-calories-out" class="block mb-2 text-sm font-medium text-gray-300">Calories Burned (kcal)</label><input type="number" id="activity-calories-out" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., 300"></div>
+            <div class="flex justify-end gap-3 mt-6">
+                 <button onclick="hideActivityModal()" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium transition">Cancel</button>
+                <button id="save-activity-btn" class="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-sm font-medium transition">Save Activity</button>
+            </div>
+        </div>
+     </div>
+
+    <!-- Custom Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-md transition-all duration-300 opacity-0 transform translate-y-4"><p id="toast-message"></p></div>
+
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, query, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const getTodayDateString = () => {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        // --- CONFIG & STATE ---
+        let db, auth, userId;
+        let currentMealCategory = '';
+        let goals = { caloriesIn: 2000, caloriesOut: 300, protein: 120 };
+        let allSavedMeals = [];
+        let dailyLogData = { loggedMeals: [], caloriesOut: 0 };
+        let isFirebaseReady = false;
+        
+        // =================================================================================
+        // === IMPORTANT: PASTE YOUR **NEW** FIREBASE CONFIGURATION OBJECT HERE ===
+        // =================================================================================
+        // 1. Create a new, free Firebase project.
+        // 2. Enable Anonymous Authentication.
+        // 3. Create a Firestore database in Production Mode.
+        // 4. Get your web app config object and paste it here, replacing this placeholder.
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyB4qvUJZZJXDLntYXAtfxaoOCb3jnDo2Yk",
+  authDomain: "tracker-42811.firebaseapp.com",
+  projectId: "tracker-42811",
+  storageBucket: "tracker-42811.firebasestorage.app",
+  messagingSenderId: "985245635128",
+  appId: "1:985245635128:web:1b37ff6f84ba9dda3b8ccd",
+  measurementId: "G-74BBTD6JZY"
+};
+        // =================================================================================
+
+        const appId = 'health-tracker-public'; // Use a consistent ID for public deployment
+
+        // --- INITIALIZATION ---
+        async function initializeFirebase() {
+            try {
+                 // Check if the config has been replaced
+                if (firebaseConfig.apiKey === "YOUR_API_KEY") {
+                    document.getElementById('loading-spinner').innerHTML = `<div class="text-center text-red-400 p-4 max-w-sm"><strong>Configuration Error:</strong><br>Please get your own free Firebase configuration object and paste it into the HTML file to connect to the database.</div>`;
+                    return;
+                }
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        await setupListeners();
+                        isFirebaseReady = true;
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                });
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+                document.getElementById('loading-spinner').innerHTML = `<div class="text-center text-red-400 p-4 max-w-sm"><strong>Database Connection Failed:</strong><br>Please double-check that you have pasted the correct firebaseConfig and enabled Anonymous Authentication in your Firebase project.</div>`;
+            }
+        }
+        
+        // --- DATA LISTENERS ---
+        async function setupListeners() {
+            if (!userId) return;
+            const goalsRef = doc(db, `artifacts/${appId}/users/${userId}/goals`, "daily");
+            onSnapshot(goalsRef, (docSnap) => {
+                if (docSnap.exists()) { goals = { ...goals, ...docSnap.data() }; } else { setDoc(goalsRef, goals); }
+                updateGoalsUI();
+                updateDashboardUI(); 
+            });
+            const todayId = getTodayDateString();
+            const logRef = doc(db, `artifacts/${appId}/users/${userId}/dailyLogs`, todayId);
+            onSnapshot(logRef, (docSnap) => {
+                dailyLogData = docSnap.exists() ? docSnap.data() : { loggedMeals: [], caloriesOut: 0 };
+                updateDashboardUI();
+            });
+            const mealsQuery = query(collection(db, `artifacts/${appId}/users/${userId}/meals`));
+            onSnapshot(mealsQuery, (querySnapshot) => {
+                allSavedMeals = [];
+                querySnapshot.forEach((doc) => allSavedMeals.push({ id: doc.id, ...doc.data() }));
+                renderSavedMeals();
+            });
+        }
+        
+        // --- UI RENDERING & UPDATES ---
+        function renderHistoryData(data) {
+            const loggedMeals = data.loggedMeals || [];
+            const totals = loggedMeals.reduce((acc, meal) => {
+                acc.caloriesIn += meal.calories || 0;
+                acc.protein += meal.protein || 0;
+                return acc;
+            }, { caloriesIn: 0, protein: 0 });
+            document.getElementById('history-calories-in').textContent = totals.caloriesIn;
+            document.getElementById('history-calories-out').textContent = data.caloriesOut || 0;
+            document.getElementById('history-protein').textContent = totals.protein;
+            const mealsListEl = document.getElementById('history-meals-list');
+            if (loggedMeals.length === 0) {
+                mealsListEl.innerHTML = '<p class="text-gray-500 text-center py-4">No meals logged.</p>';
+                return;
+            }
+            const groupedMeals = loggedMeals.reduce((acc, meal) => {
+                const category = meal.category || 'Uncategorized';
+                if (!acc[category]) acc[category] = [];
+                acc[category].push(meal);
+                return acc;
+            }, {});
+            let mealHtml = '';
+            for (const category in groupedMeals) {
+                mealHtml += `<h3 class="font-semibold text-lg text-indigo-300 mt-4 first:mt-0">${category}</h3>`;
+                groupedMeals[category].forEach(meal => {
+                    mealHtml += `<div class="bg-gray-700 p-3 rounded-lg flex justify-between items-center"><div><p class="font-medium">${meal.name}</p><p class="text-xs text-gray-400">${meal.calories} kcal &bull; ${meal.protein}g protein</p></div></div>`;
+                });
+            }
+            mealsListEl.innerHTML = mealHtml;
+        }
+        function updateDashboardUI() {
+            const totals = dailyLogData.loggedMeals.reduce((acc, meal) => {
+                acc.caloriesIn += meal.calories || 0;
+                acc.protein += meal.protein || 0;
+                return acc;
+            }, { caloriesIn: 0, protein: 0 });
+            const caloriesOut = dailyLogData.caloriesOut || 0;
+            document.getElementById('calories-in-value').textContent = totals.caloriesIn;
+            document.getElementById('protein-value').textContent = totals.protein;
+            document.getElementById('calories-out-value').textContent = caloriesOut;
+            const calInPercent = goals.caloriesIn > 0 ? Math.min((totals.caloriesIn / goals.caloriesIn) * 100, 100) : 0;
+            const proteinPercent = goals.protein > 0 ? Math.min((totals.protein / goals.protein) * 100, 100) : 0;
+            const calOutPercent = goals.caloriesOut > 0 ? Math.min((caloriesOut / goals.caloriesOut) * 100, 100) : 0;
+            document.getElementById('calories-in-circle').style.setProperty('--progress', `${calInPercent}%`);
+            document.getElementById('protein-circle').style.setProperty('--progress', `${proteinPercent}%`);
+            document.getElementById('calories-out-circle').style.setProperty('--progress', `${calOutPercent}%`);
+        }
+        function updateGoalsUI() {
+            document.getElementById('goal-calories-in').value = goals.caloriesIn;
+            document.getElementById('goal-calories-out').value = goals.caloriesOut;
+            document.getElementById('goal-protein').value = goals.protein;
+            document.getElementById('calories-in-goal').textContent = `Goal: ${goals.caloriesIn}`;
+            document.getElementById('calories-out-goal').textContent = `Goal: ${goals.caloriesOut}`;
+            document.getElementById('protein-goal').textContent = `Goal: ${goals.protein}g`;
+        }
+        function renderSavedMeals(filter = '') {
+            const listEl = document.getElementById('saved-meals-list');
+            if(!listEl) return;
+            listEl.innerHTML = '';
+            const filteredMeals = allSavedMeals.filter(meal => meal.name.toLowerCase().includes(filter.toLowerCase()));
+            if(filteredMeals.length === 0) {
+                listEl.innerHTML = `<p class="text-gray-500 text-center py-4">No meals found. Add one!</p>`;
+                return;
+            }
+            filteredMeals.forEach(meal => {
+                const mealEl = document.createElement('div');
+                mealEl.className = 'bg-gray-700 p-4 rounded-lg flex justify-between items-center';
+                mealEl.innerHTML = `<div><p class="font-semibold">${meal.name}</p><p class="text-sm text-gray-400">${meal.calories} kcal &bull; ${meal.protein}g protein</p></div><button class="bg-indigo-600 p-2 rounded-full hover:bg-indigo-500 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg></button>`;
+                mealEl.querySelector('button').onclick = () => logMeal(meal);
+                listEl.appendChild(mealEl);
+            });
+        }
+        
+        // --- ACTIONS & EVENT HANDLERS ---
+        async function handleSaveGoals() {
+            const newGoals = { caloriesIn: parseInt(document.getElementById('goal-calories-in').value) || 0, caloriesOut: parseInt(document.getElementById('goal-calories-out').value) || 0, protein: parseInt(document.getElementById('goal-protein').value) || 0 };
+            const goalsRef = doc(db, `artifacts/${appId}/users/${userId}/goals`, "daily");
+            await setDoc(goalsRef, newGoals);
+            showToast('Goals saved successfully!', 'success');
+            showPage('page-dashboard');
+        }
+        async function handleSaveNewMeal() {
+            const newMeal = { name: document.getElementById('new-meal-name').value.trim(), calories: parseInt(document.getElementById('new-meal-calories').value) || 0, protein: parseInt(document.getElementById('new-meal-protein').value) || 0, carbs: parseInt(document.getElementById('new-meal-carbs').value) || 0 };
+            if (!newMeal.name) { showToast('Meal name required.', 'error'); return; }
+            const mealsCollection = collection(db, `artifacts/${appId}/users/${userId}/meals`);
+            await addDoc(mealsCollection, newMeal);
+            showToast(`'${newMeal.name}' added to library.`, 'success');
+            ['new-meal-name', 'new-meal-calories', 'new-meal-protein', 'new-meal-carbs'].forEach(id => document.getElementById(id).value = '');
+            showPage('page-meal-logging');
+        }
+        async function logMeal(mealData) {
+            const todayId = getTodayDateString();
+            const logRef = doc(db, `artifacts/${appId}/users/${userId}/dailyLogs`, todayId);
+            const mealToLog = { ...mealData, category: currentMealCategory, timestamp: new Date() };
+            const docSnap = await getDoc(logRef);
+            if (docSnap.exists()) {
+                const updatedMeals = [...(docSnap.data().loggedMeals || []), mealToLog];
+                await updateDoc(logRef, { loggedMeals: updatedMeals });
+            } else {
+                await setDoc(logRef, { loggedMeals: [mealToLog], caloriesOut: 0 });
+            }
+            showToast(`${mealData.name} logged!`, 'success');
+            showPage('page-log-meal-selection');
+        }
+        async function handleSaveActivity() {
+            const caloriesOutValue = parseInt(document.getElementById('activity-calories-out').value) || 0;
+            if (caloriesOutValue < 0) { showToast("Cannot be negative.", "error"); return; }
+            const todayId = getTodayDateString();
+            const logRef = doc(db, `artifacts/${appId}/users/${userId}/dailyLogs`, todayId);
+            await setDoc(logRef, { caloriesOut: caloriesOutValue }, { merge: true });
+            showToast("Activity logged!", "success");
+            hideActivityModal();
+        }
+        async function fetchAndRenderHistory(dateString) {
+            const loadingEl = document.getElementById('history-loading');
+            const noDataEl = document.getElementById('history-no-data');
+            const contentEl = document.getElementById('history-content');
+            loadingEl.style.display = 'block';
+            noDataEl.style.display = 'none';
+            contentEl.style.display = 'none';
+            if (!userId) { loadingEl.style.display = 'none'; noDataEl.style.display = 'block'; return; }
+            const logRef = doc(db, `artifacts/${appId}/users/${userId}/dailyLogs`, dateString);
+            try {
+                const docSnap = await getDoc(logRef);
+                if (docSnap.exists()) { renderHistoryData(docSnap.data()); contentEl.style.display = 'block'; } else { noDataEl.style.display = 'block'; }
+            } catch (error) {
+                console.error("Error fetching history:", error);
+                showToast("Failed to load history.", "error");
+                noDataEl.style.display = 'block';
+            } finally {
+                loadingEl.style.display = 'none';
+            }
+        }
+
+        // --- NAVIGATION & UTILS ---
+        window.showPage = (pageId) => {
+            document.querySelectorAll('#app-container .page').forEach(p => p.classList.remove('active'));
+            const newPage = document.getElementById(pageId);
+            if (newPage) newPage.classList.add('active');
+            window.scrollTo(0, 0);
+        };
+        window.showHistoryPage = () => {
+            const datePicker = document.getElementById('history-date-picker');
+            datePicker.value = getTodayDateString();
+            datePicker.max = getTodayDateString();
+            showPage('page-history');
+            fetchAndRenderHistory(datePicker.value);
+        };
+        window.showMealLoggingPage = (category) => {
+            currentMealCategory = category;
+            document.getElementById('meal-category-title').textContent = category;
+            showPage('page-meal-logging');
+            renderSavedMeals();
+        };
+        window.showActivityModal = () => { document.getElementById('activity-modal-backdrop').classList.add('active'); document.getElementById('activity-modal').classList.add('active'); };
+        window.hideActivityModal = () => { document.getElementById('activity-modal-backdrop').classList.remove('active'); document.getElementById('activity-modal').classList.remove('active'); };
+        let toastTimer;
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            clearTimeout(toastTimer);
+            toastMessage.textContent = message;
+            toast.className = toast.className.replace(/bg-green-500|bg-red-500/g, '');
+            toast.classList.add(type === 'success' ? 'bg-green-500' : 'bg-red-500', 'opacity-100', 'translate-y-0');
+            toast.classList.remove('opacity-0', 'translate-y-4');
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'translate-y-4');
+            }, 3000);
+        }
+        
+        // --- PIN/LOGIN GATE ---
+        let pinInput = '';
+        let isSettingPin = false;
+        function initLoginGate() {
+            initializeFirebase();
+            const storedPin = localStorage.getItem('health_tracker_pin');
+            const keypad = document.getElementById('keypad');
+            document.getElementById('page-login').classList.add('active');
+            document.getElementById('loading-spinner').style.display = 'none';
+            const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫'];
+            keypad.innerHTML = keys.map(key => `<button class="bg-gray-800 h-16 text-2xl font-bold rounded-full hover:bg-gray-700 transition focus:outline-none ${!key ? 'opacity-0' : ''}" data-key="${key}">${key}</button>`).join('');
+            keypad.addEventListener('click', (e) => { if(e.target.dataset.key) handleKeyPress(e.target.dataset.key); });
+            if (storedPin) { isSettingPin = false; document.getElementById('pin-title').textContent = "Enter PIN"; document.getElementById('pin-subtitle').textContent = "Enter your 4-digit PIN to continue."; } else { isSettingPin = true; document.getElementById('pin-title').textContent = "Create a PIN"; document.getElementById('pin-subtitle').textContent = "Set a 4-digit PIN for quick access."; }
+        }
+        function handleKeyPress(key) {
+            if (key === '⌫') { pinInput = pinInput.slice(0, -1); } else if (pinInput.length < 4) { pinInput += key; }
+            updatePinDots();
+            if (pinInput.length === 4) {
+                const storedPin = localStorage.getItem('health_tracker_pin');
+                if (isSettingPin) { localStorage.setItem('health_tracker_pin', pinInput); showToast("PIN Created!", "success"); unlockApp(); } else {
+                    if (pinInput === storedPin) { unlockApp(); } else {
+                        const pinDotsContainer = document.getElementById('pin-dots').parentElement;
+                        pinDotsContainer.classList.add('animate-shake');
+                        showToast("Incorrect PIN", "error");
+                        pinInput = '';
+                        setTimeout(() => { pinDotsContainer.classList.remove('animate-shake'); updatePinDots(); }, 500);
+                    }
+                }
+            }
+        }
+        function updatePinDots() {
+            document.querySelectorAll('#pin-dots span').forEach((dot, index) => {
+                if(index < pinInput.length) { dot.classList.add('bg-indigo-400', 'scale-110'); dot.classList.remove('bg-gray-700'); } else { dot.classList.remove('bg-indigo-400', 'scale-110'); dot.classList.add('bg-gray-700'); }
+            });
+        }
+        function unlockApp() {
+            document.getElementById('page-login').style.display = 'none';
+            document.getElementById('loading-spinner').style.display = 'flex';
+            const readyCheck = setInterval(() => {
+                if (isFirebaseReady) {
+                    clearInterval(readyCheck);
+                    document.getElementById('loading-spinner').style.display = 'none';
+                    document.getElementById('app-container').style.display = 'block';
+                    showPage('page-dashboard');
+                }
+            }, 100);
+        }
+        function handleChangePin() {
+            const currentPin = document.getElementById('current-pin').value;
+            const newPin = document.getElementById('new-pin').value;
+            const confirmNewPin = document.getElementById('confirm-new-pin').value;
+            const storedPin = localStorage.getItem('health_tracker_pin');
+            if (currentPin !== storedPin) { showToast("Current PIN is incorrect.", "error"); return; }
+            if (!/^\d{4}$/.test(newPin)) { showToast("New PIN must be 4 digits.", "error"); return; }
+            if (newPin !== confirmNewPin) { showToast("New PINs do not match.", "error"); return; }
+            if (newPin === storedPin) { showToast("New PIN cannot be the same as the old PIN.", "error"); return; }
+            localStorage.setItem('health_tracker_pin', newPin);
+            showToast("PIN changed successfully!", "success");
+            ['current-pin', 'new-pin', 'confirm-new-pin'].forEach(id => document.getElementById(id).value = '');
+            showPage('page-goals');
+        }
+
+        // --- BIND EVENTS ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initLoginGate();
+            document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+            document.getElementById('save-goals-btn').addEventListener('click', handleSaveGoals);
+            document.getElementById('save-new-meal-btn').addEventListener('click', handleSaveNewMeal);
+            document.getElementById('search-meal-input').addEventListener('input', (e) => renderSavedMeals(e.target.value));
+            document.getElementById('save-activity-btn').addEventListener('click', handleSaveActivity);
+            document.getElementById('save-new-pin-btn').addEventListener('click', handleChangePin);
+            document.getElementById('history-date-picker').addEventListener('change', (e) => fetchAndRenderHistory(e.target.value));
+        });
+
+        // Make functions globally accessible for inline onclick handlers
+        window.logMeal = logMeal;
+    </script>
+</body>
+</html>
+
