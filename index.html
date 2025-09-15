@@ -12,6 +12,8 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -42,18 +44,18 @@
     
     <!-- AUTHENTICATION PAGE -->
      <div id="page-auth" class="page">
-        <div class="flex flex-col items-center justify-center min-h-screen p-4 text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-indigo-400 mb-4" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
-            </svg>
-            <h1 class="text-3xl font-bold text-white mb-2">Health Tracker</h1>
-            <p class="text-gray-400 mb-8 max-w-sm">Sign in to securely save and access your health data from any device.</p>
-            <button id="google-signin-btn" class="bg-white text-gray-800 font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-gray-200 transition flex items-center gap-3">
-                <svg class="w-6 h-6" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></svg>
-                Sign in with Google
-            </button>
-        </div>
-    </div>
+         <div class="flex flex-col items-center justify-center min-h-screen p-4 text-center">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-indigo-400 mb-4" viewBox="0 0 20 20" fill="currentColor">
+                 <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+             </svg>
+             <h1 class="text-3xl font-bold text-white mb-2">Health Tracker</h1>
+             <p class="text-gray-400 mb-8 max-w-sm">Sign in to securely save and access your health data from any device.</p>
+             <button id="google-signin-btn" class="bg-white text-gray-800 font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-gray-200 transition flex items-center gap-3">
+                 <svg class="w-6 h-6" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></svg>
+                 Sign in with Google
+             </button>
+         </div>
+     </div>
 
     <div id="app-container" class="max-w-xl mx-auto p-4 md:p-6 min-h-screen hidden">
 
@@ -61,33 +63,57 @@
         <div id="page-dashboard" class="page">
             <header class="flex justify-between items-center mb-8">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-100">Today's Stats</h1>
-                    <p id="today-date" class="text-indigo-400"></p>
+                    <h1 class="text-3xl font-bold text-gray-100"><span id="welcome-message">Welcome</span>, <span id="user-name"></span></h1>
+                    <div id="dashboard-date-selector" class="relative cursor-pointer group">
+                        <span id="today-date-display" class="text-indigo-400 group-hover:text-indigo-300 transition"></span>
+                        <input type="date" id="dashboard-date-input" class="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer">
+                    </div>
                 </div>
                 <div class="flex items-center gap-2">
+                    <button onclick="showProfilePage()" class="text-gray-400 hover:text-white transition p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" /></svg></button>
                     <button onclick="showHistoryPage()" class="text-gray-400 hover:text-white transition p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></button>
-                    <button onclick="showPage('page-goals')" class="text-gray-400 hover:text-white transition p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg></button>
+                    <button onclick="showGoalsPage()" class="text-gray-400 hover:text-white transition p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg></button>
                 </div>
             </header>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 text-center">
-                <div class="bg-gray-800 p-4 rounded-2xl flex flex-col items-center justify-center"><div id="calories-in-circle" class="progress-circle from-sky-400 w-32 h-32 rounded-full flex items-center justify-center transition-all duration-500"><div class="text-center"><span id="calories-in-value" class="text-2xl font-bold">0</span><span class="text-xs text-gray-400 block">kcal</span></div></div><p class="mt-3 font-medium">Calories In</p><p id="calories-in-goal" class="text-sm text-gray-500">Goal: 0</p></div>
-                <div class="bg-gray-800 p-4 rounded-2xl flex flex-col items-center justify-center"><div id="calories-out-circle" class="progress-circle from-rose-500 w-32 h-32 rounded-full flex items-center justify-center transition-all duration-500"><div class="text-center"><span id="calories-out-value" class="text-2xl font-bold">0</span><span class="text-xs text-gray-400 block">kcal</span></div></div><p class="mt-3 font-medium">Calories Out</p><p id="calories-out-goal" class="text-sm text-gray-500">Goal: 0</p></div>
-                <div class="bg-gray-800 p-4 rounded-2xl flex flex-col items-center justify-center"><div id="protein-circle" class="progress-circle from-emerald-400 w-32 h-32 rounded-full flex items-center justify-center transition-all duration-500"><div class="text-center"><span id="protein-value" class="text-2xl font-bold">0</span><span class="text-xs text-gray-400 block">grams</span></div></div><p class="mt-3 font-medium">Protein</p><p id="protein-goal" class="text-sm text-gray-500">Goal: 0</p></div>
+                <div id="dashboard-card-calories-in" class="bg-gray-800 p-4 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition"><div id="calories-in-circle" class="progress-circle from-sky-400 w-32 h-32 rounded-full flex items-center justify-center transition-all duration-500"><div class="text-center"><span id="calories-in-value" class="text-2xl font-bold">0</span><span class="text-xs text-gray-400 block">kcal</span></div></div><p class="mt-3 font-medium">Calories In</p><p id="calories-in-goal" class="text-sm text-gray-500">Goal: 0</p></div>
+                <div id="dashboard-card-calories-out" class="bg-gray-800 p-4 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition"><div id="calories-out-circle" class="progress-circle from-rose-500 w-32 h-32 rounded-full flex items-center justify-center transition-all duration-500"><div class="text-center"><span id="calories-out-value" class="text-2xl font-bold">0</span><span class="text-xs text-gray-400 block">kcal</span></div></div><p class="mt-3 font-medium">Calories Out</p><p id="calories-out-goal" class="text-sm text-gray-500">Goal: 0</p></div>
+                <div id="dashboard-card-protein" class="bg-gray-800 p-4 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700 transition"><div id="protein-circle" class="progress-circle from-emerald-400 w-32 h-32 rounded-full flex items-center justify-center transition-all duration-500"><div class="text-center"><span id="protein-value" class="text-2xl font-bold">0</span><span class="text-xs text-gray-400 block">grams</span></div></div><p class="mt-3 font-medium">Protein</p><p id="protein-goal" class="text-sm text-gray-500">Goal: 0</p></div>
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <button onclick="showPage('page-log-meal-selection')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-4 rounded-xl shadow-lg transition-transform transform hover:scale-105 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.993.883L4 8v10a1 1 0 00.883.993L5 19h10a1 1 0 00.993-.883L16 18V8a1 1 0 00-.883-.993L15 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4z" /></svg>Log Meal</button>
                 <button onclick="showActivityModal()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-4 px-4 rounded-xl shadow-lg transition-transform transform hover:scale-105 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>Log Activity</button>
             </div>
+            <div class="text-center text-gray-600 text-xs mt-8">
+                v4
+            </div>
+        </div>
+
+        <!-- PROFILE PAGE -->
+        <div id="page-profile" class="page">
+             <header class="flex items-center mb-8"><button onclick="showPage('page-dashboard')" class="mr-4 p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-3xl font-bold text-gray-100">Your Profile</h1></header>
+            <div class="space-y-6 bg-gray-800 p-6 rounded-2xl mb-6">
+                <h2 class="text-xl font-semibold text-gray-200 border-b border-gray-700 pb-3">Personal Details</h2>
+                <div><label for="profile-name" class="block mb-2 text-sm font-medium text-gray-300">Display Name</label><input type="text" id="profile-name" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                <div><label for="profile-age" class="block mb-2 text-sm font-medium text-gray-300">Age</label><input type="number" id="profile-age" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                <div><label for="profile-weight" class="block mb-2 text-sm font-medium text-gray-300">Weight (kg)</label><input type="number" id="profile-weight" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                <div><label for="profile-height" class="block mb-2 text-sm font-medium text-gray-300">Height (cm)</label><input type="number" id="profile-height" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                <button id="save-profile-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition-transform transform hover:scale-105">Save Profile</button>
+            </div>
         </div>
 
         <!-- GOALS PAGE -->
         <div id="page-goals" class="page">
-            <header class="flex items-center mb-8"><button onclick="showPage('page-dashboard')" class="mr-4 p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-3xl font-bold text-gray-100">Set Daily Goals</h1></header>
+            <header class="flex items-center mb-8"><button onclick="showPage('page-dashboard')" class="mr-4 p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-3xl font-bold text-gray-100">Settings</h1></header>
             <div class="space-y-6 bg-gray-800 p-6 rounded-2xl">
+                <h2 class="text-xl font-semibold text-gray-200 border-b border-gray-700 pb-3">Daily Goals</h2>
                 <div><label for="goal-calories-in" class="block mb-2 text-sm font-medium text-gray-300">Daily Calorie Intake Goal</label><input type="number" id="goal-calories-in" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., 2000"></div>
                 <div><label for="goal-calories-out" class="block mb-2 text-sm font-medium text-gray-300">Daily Calorie Burn Goal</label><input type="number" id="goal-calories-out" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., 500"></div>
                 <div><label for="goal-protein" class="block mb-2 text-sm font-medium text-gray-300">Daily Protein Intake Goal (grams)</label><input type="number" id="goal-protein" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., 150"></div>
                 <button id="save-goals-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition-transform transform hover:scale-105">Save Goals</button>
+            </div>
+             <div class="mt-6 bg-gray-800 p-6 rounded-2xl">
+                <h2 class="text-xl font-semibold text-gray-200 border-b border-gray-700 pb-3">Account</h2>
                 <button id="sign-out-btn" class="w-full mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl transition-transform transform hover:scale-105">Sign Out</button>
             </div>
         </div>
@@ -95,25 +121,60 @@
         <!-- HISTORY PAGE -->
         <div id="page-history" class="page">
             <header class="flex items-center mb-6"><button onclick="showPage('page-dashboard')" class="mr-4 p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-3xl font-bold text-gray-100">History</h1></header>
-            <div class="bg-gray-800 p-4 rounded-2xl mb-6"><label for="history-date-picker" class="block text-sm font-medium text-gray-400 mb-2">Select a date to view</label><input type="date" id="history-date-picker" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+            
+            <div class="bg-gray-800 p-4 rounded-2xl mb-6">
+                 <div class="flex space-x-2 bg-gray-700 rounded-lg p-1 mb-4">
+                    <button id="history-view-date" class="w-full py-2 text-sm font-medium rounded-md transition">Date</button>
+                    <button id="history-view-week" class="w-full py-2 text-sm font-medium rounded-md transition">This Week</button>
+                    <button id="history-view-month" class="w-full py-2 text-sm font-medium rounded-md transition">This Month</button>
+                    <button id="history-view-year" class="w-full py-2 text-sm font-medium rounded-md transition">This Year</button>
+                </div>
+                <div id="history-date-picker-container">
+                    <label for="history-date-picker" class="block text-sm font-medium text-gray-400 mb-2">Select a date to view</label>
+                    <input type="date" id="history-date-picker" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3">
+                </div>
+            </div>
+
             <div id="history-data-container">
                 <div id="history-loading" class="text-center py-8 text-gray-500 hidden"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-400 mx-auto"></div><p class="mt-2">Loading data...</p></div>
-                <div id="history-no-data" class="text-center py-8 hidden"><svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg><p class="mt-4 text-gray-400">No data logged for this day.</p></div>
-                <div id="history-content" class="hidden">
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 text-center">
-                        <div class="bg-gray-700 p-4 rounded-xl"><p class="text-sm text-sky-400">Calories In</p><p class="text-2xl font-bold"><span id="history-calories-in">0</span> kcal</p></div>
-                        <div class="bg-gray-700 p-4 rounded-xl"><p class="text-sm text-rose-400">Calories Out</p><p class="text-2xl font-bold"><span id="history-calories-out">0</span> kcal</p></div>
-                        <div class="bg-gray-700 p-4 rounded-xl"><p class="text-sm text-emerald-400">Protein</p><p class="text-2xl font-bold"><span id="history-protein">0</span> g</p></div>
+                <div id="history-no-data" class="text-center py-8 hidden"><svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg><p class="mt-4 text-gray-400">No data logged for this period.</p></div>
+                <div id="history-content" class="hidden space-y-6">
+                    <div id="chart-container" class="bg-gray-800 p-4 rounded-2xl">
+                        <canvas id="history-chart"></canvas>
                     </div>
-                    <h2 class="text-xl font-semibold mb-3 text-gray-300">Daily Log</h2>
-                    <div id="history-log-list" class="space-y-3"></div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                        <div id="history-card-in" class="bg-gray-700 p-4 rounded-xl cursor-pointer hover:bg-gray-600 transition"><p class="text-sm text-sky-400">Calories In</p><p class="text-2xl font-bold"><span id="history-calories-in">0</span> kcal</p></div>
+                        <div id="history-card-out" class="bg-gray-700 p-4 rounded-xl cursor-pointer hover:bg-gray-600 transition"><p class="text-sm text-rose-400">Calories Out</p><p class="text-2xl font-bold"><span id="history-calories-out">0</span> kcal</p></div>
+                        <div id="history-card-protein" class="bg-gray-700 p-4 rounded-xl cursor-pointer hover:bg-gray-600 transition"><p class="text-sm text-emerald-400">Protein</p><p class="text-2xl font-bold"><span id="history-protein">0</span> g</p></div>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                             <h2 id="history-log-title" class="text-xl font-semibold text-gray-300">Detailed Log</h2>
+                             <div id="history-log-buttons" class="grid grid-cols-2 gap-2">
+                                <button onclick="showPage('page-log-meal-selection')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 rounded-lg flex items-center justify-center text-sm"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.993.883L4 8v10a1 1 0 00.883.993L5 19h10a1 1 0 00.993-.883L16 18V8a1 1 0 00-.883-.993L15 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4z" /></svg>Meal</button>
+                                <button onclick="showActivityModal()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-3 rounded-lg flex items-center justify-center text-sm"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>Activity</button>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2 bg-gray-700 rounded-lg p-1 mb-4">
+                           <button id="filter-all" class="w-full py-2 text-sm font-medium rounded-md transition">All</button>
+                           <button id="filter-meals" class="w-full py-2 text-sm font-medium rounded-md transition">Meals</button>
+                           <button id="filter-activities" class="w-full py-2 text-sm font-medium rounded-md transition">Activities</button>
+                       </div>
+                        <div id="history-log-list" class="space-y-3"></div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- LOG MEAL SELECTION PAGE -->
         <div id="page-log-meal-selection" class="page">
-             <header class="flex items-center mb-8"><button onclick="showPage('page-dashboard')" class="mr-4 p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-3xl font-bold text-gray-100">Log a Meal</h1></header>
+             <header class="flex items-center mb-8"><button onclick="goBackFromMealSelection()" class="mr-4 p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-3xl font-bold text-gray-100">Log a Meal</h1></header>
+            <div class="bg-gray-800 p-4 rounded-2xl mb-6">
+                 <label for="log-meal-date-picker" class="block text-sm font-medium text-gray-400 mb-2">Logging for date:</label>
+                 <input type="date" id="log-meal-date-picker" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3">
+            </div>
             <div class="grid grid-cols-2 gap-4">
                 <button onclick="showMealLoggingPage('Breakfast')" class="bg-gray-800 p-6 rounded-2xl text-center hover:bg-gray-700 transition"><span class="text-4xl">🍳</span><span class="block mt-2 font-semibold">Breakfast</span></button>
                 <button onclick="showMealLoggingPage('Lunch')" class="bg-gray-800 p-6 rounded-2xl text-center hover:bg-gray-700 transition"><span class="text-4xl">🥗</span><span class="block mt-2 font-semibold">Lunch</span></button>
@@ -125,6 +186,7 @@
         <!-- MEAL LOGGING PAGE -->
         <div id="page-meal-logging" class="page">
              <header class="flex items-center mb-6"><button onclick="showPage('page-log-meal-selection')" class="mr-4 p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-3xl font-bold text-gray-100">Log <span id="meal-category-title"></span></h1></header>
+             <div id="log-date-display-logging" class="text-center text-indigo-400 -mt-4 mb-4"></div>
             <div class="mb-4"><input type="text" id="search-meal-input" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="Search saved meals..."></div>
             <div id="saved-meals-list" class="space-y-3 max-h-[50vh] overflow-y-auto pr-2"></div>
             <button onclick="showPage('page-add-new-meal')" class="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition-transform transform hover:scale-105">Add New Meal</button>
@@ -133,8 +195,17 @@
         <!-- ADD MEAL PAGE -->
         <div id="page-add-new-meal" class="page">
             <header class="flex items-center mb-8"><button onclick="showPage('page-meal-logging')" class="mr-4 p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-3xl font-bold text-gray-100">Add a New Meal</h1></header>
+             <div id="log-date-display-add" class="text-center text-indigo-400 -mt-6 mb-4"></div>
             <div class="space-y-4 bg-gray-800 p-6 rounded-2xl">
-                <div><label for="new-meal-name" class="block mb-2 text-sm font-medium text-gray-300">Meal Name</label><input type="text" id="new-meal-name" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., Grilled Chicken Salad"></div>
+                <div>
+                    <label for="new-meal-name" class="block mb-2 text-sm font-medium text-gray-300">Meal Description</label>
+                    <input type="text" id="new-meal-name" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., Grilled Chicken Salad">
+                    <button id="get-ai-nutrients-btn" class="w-full mt-3 bg-violet-600 hover:bg-violet-700 text-white font-bold py-2 px-4 rounded-xl transition-transform transform hover:scale-105 flex items-center justify-center gap-2">
+                         <span id="ai-btn-text">Analyze with AI ✨</span>
+                         <div id="ai-icon-loading" class="animate-spin rounded-full h-5 w-5 border-b-2 border-white hidden"></div>
+                    </button>
+                </div>
+                 <p class="text-center text-gray-500 text-xs">Or enter details manually below</p>
                 <div><label for="new-meal-calories" class="block mb-2 text-sm font-medium text-gray-300">Calories (kcal)</label><input type="number" id="new-meal-calories" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
                 <div><label for="new-meal-protein" class="block mb-2 text-sm font-medium text-gray-300">Protein (g)</label><input type="number" id="new-meal-protein" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
                 <div><label for="new-meal-carbs" class="block mb-2 text-sm font-medium text-gray-300">Carbohydrates (g)</label><input type="number" id="new-meal-carbs" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
@@ -146,441 +217,77 @@
     <!-- ACTIVITY LOG MODAL -->
      <div id="activity-modal-backdrop" class="modal-backdrop"></div>
      <div id="activity-modal" class="modal w-full max-w-sm">
-        <div class="bg-gray-800 rounded-2xl shadow-lg p-6">
-            <h2 class="text-2xl font-bold mb-4">Log Activity</h2>
-             <div class="space-y-4">
-                <div><label for="activity-description" class="block mb-2 text-sm font-medium text-gray-300">Description</label><input type="text" id="activity-description" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., Morning Run"></div>
-                <div><label for="activity-calories-out" class="block mb-2 text-sm font-medium text-gray-300">Calories Burned (kcal)</label><input type="number" id="activity-calories-out" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., 300"></div>
+         <div class="bg-gray-800 rounded-2xl shadow-lg p-6">
+             <h2 class="text-2xl font-bold mb-4">Log Activity</h2>
+              <div class="space-y-4">
+                 <div>
+                    <label for="log-activity-date-picker" class="block text-sm font-medium text-gray-400 mb-2">Log activity for date:</label>
+                    <input type="date" id="log-activity-date-picker" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3 mb-4">
+                 </div>
+                 <div><label for="activity-description" class="block mb-2 text-sm font-medium text-gray-300">Description</label><input type="text" id="activity-description" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., Morning Run"></div>
+                 <div><label for="activity-calories-out" class="block mb-2 text-sm font-medium text-gray-300">Calories Burned (kcal)</label><input type="number" id="activity-calories-out" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., 300"></div>
             </div>
-            <div class="flex justify-end gap-3 mt-6">
+             <div class="flex justify-end gap-3 mt-6">
                  <button onclick="hideActivityModal()" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium transition">Cancel</button>
-                <button id="save-activity-btn" class="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-sm font-medium transition">Save Activity</button>
-            </div>
-        </div>
+                 <button id="save-activity-btn" class="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-sm font-medium transition">Save Activity</button>
+             </div>
+         </div>
      </div>
 
      <!-- EDIT MEAL MODAL -->
      <div id="edit-meal-modal-backdrop" class="modal-backdrop"></div>
      <div id="edit-meal-modal" class="modal w-full max-w-sm">
-        <div class="bg-gray-800 rounded-2xl shadow-lg p-6">
-            <h2 class="text-2xl font-bold mb-4">Edit Meal</h2>
-            <input type="hidden" id="edit-meal-id">
-            <div class="space-y-4">
-                <div><label for="edit-meal-name" class="block mb-2 text-sm font-medium text-gray-300">Meal Name</label><input type="text" id="edit-meal-name" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
-                <div><label for="edit-meal-calories" class="block mb-2 text-sm font-medium text-gray-300">Calories (kcal)</label><input type="number" id="edit-meal-calories" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
-                <div><label for="edit-meal-protein" class="block mb-2 text-sm font-medium text-gray-300">Protein (g)</label><input type="number" id="edit-meal-protein" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
-                <div><label for="edit-meal-carbs" class="block mb-2 text-sm font-medium text-gray-300">Carbohydrates (g)</label><input type="number" id="edit-meal-carbs" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
-            </div>
-            <div class="flex justify-end gap-3 mt-6">
-                 <button onclick="hideEditMealModal()" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium transition">Cancel</button>
-                <button id="save-updated-meal-btn" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition">Save Changes</button>
-            </div>
-        </div>
+         <div class="bg-gray-800 rounded-2xl shadow-lg p-6">
+             <h2 class="text-2xl font-bold mb-4">Edit Meal</h2>
+             <input type="hidden" id="edit-meal-id">
+             <div class="space-y-4">
+                 <div><label for="edit-meal-name" class="block mb-2 text-sm font-medium text-gray-300">Meal Name</label><input type="text" id="edit-meal-name" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                 <div><label for="edit-meal-calories" class="block mb-2 text-sm font-medium text-gray-300">Calories (kcal)</label><input type="number" id="edit-meal-calories" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                 <div><label for="edit-meal-protein" class="block mb-2 text-sm font-medium text-gray-300">Protein (g)</label><input type="number" id="edit-meal-protein" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                 <div><label for="edit-meal-carbs" class="block mb-2 text-sm font-medium text-gray-300">Carbohydrates (g)</label><input type="number" id="edit-meal-carbs" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+             </div>
+             <div class="flex justify-end gap-3 mt-6">
+                  <button onclick="hideEditMealModal()" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium transition">Cancel</button>
+                 <button id="save-updated-meal-btn" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition">Save Changes</button>
+             </div>
+         </div>
      </div>
 
      <!-- CONFIRM DELETE MODAL -->
      <div id="confirm-delete-modal-backdrop" class="modal-backdrop"></div>
      <div id="confirm-delete-modal" class="modal w-full max-w-sm">
-        <div class="bg-gray-800 rounded-2xl shadow-lg p-6">
-            <h2 class="text-2xl font-bold mb-2">Are you sure?</h2>
-            <p id="confirm-delete-message" class="text-gray-400 mb-6">This action cannot be undone.</p>
-            <div class="flex justify-end gap-3 mt-6">
-                <button onclick="hideConfirmDeleteModal()" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium transition">Cancel</button>
-                <button id="confirm-delete-btn" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-medium transition">Delete</button>
-            </div>
-        </div>
+         <div class="bg-gray-800 rounded-2xl shadow-lg p-6">
+             <h2 class="text-2xl font-bold mb-2">Are you sure?</h2>
+             <p id="confirm-delete-message" class="text-gray-400 mb-6">This action cannot be undone.</p>
+             <div class="flex justify-end gap-3 mt-6">
+                 <button onclick="hideConfirmDeleteModal()" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium transition">Cancel</button>
+                 <button id="confirm-delete-btn" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-medium transition">Delete</button>
+             </div>
+         </div>
      </div>
 
     <!-- Custom Toast Notification -->
     <div id="toast" class="fixed bottom-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-md transition-all duration-300 opacity-0 transform translate-y-4"><p id="toast-message"></p></div>
 
     <!-- Firebase -->
-    <script type="module">
+    <script type="module" defer>
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, query, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, query, updateDoc, deleteDoc, where, getDocs, Timestamp, documentId } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const getTodayDateString = () => {
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        };
+        // --- UTILITY FUNCTIONS ---
+        // --- UTILITY FUNCTIONS ---
+const getLocalDateString = (date = new Date()) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
 
-        // --- CONFIG & STATE ---
-        let db, auth, userId;
-        let currentMealCategory = '';
-        let goals = { caloriesIn: 2000, caloriesOut: 300, protein: 120 };
-        let allSavedMeals = [];
-        let dailyLogData = { loggedMeals: [], loggedActivities: [] };
-        let currentlyViewedDate = getTodayDateString();
-        
-        // =================================================================================
-        // === IMPORTANT: PASTE YOUR **NEW** FIREBASE CONFIGURATION OBJECT HERE ===
-        // =================================================================================
-        const firebaseConfig = {
-    apiKey: "AIzaSyB4qvUJZZJXDLntYXAtfxaoOCb3jnDo2Yk",
-    authDomain: "tracker-42811.firebaseapp.com",
-    projectId: "tracker-42811",
-    storageBucket: "tracker-42811.firebasestorage.app",
-    messagingSenderId: "985245635128",
-    appId: "1:985245635128:web:1b37ff6f84ba9dda3b8ccd",
-    measurementId: "G-74BBTD6JZY"
-        };
-        // =================================================================================
+const getTodayDateString = () => {
+    return getLocalDateString(new Date());
+};
 
-        const appId = 'health-tracker-public';
-
-        // --- INITIALIZATION ---
-        async function initializeFirebase() {
-            try {
-                if (firebaseConfig.apiKey === "YOUR_API_KEY") {
-                    document.getElementById('loading-spinner').innerHTML = `<div class="text-center text-red-400 p-4 max-w-sm"><strong>Configuration Error:</strong><br>Please get your own free Firebase configuration object and paste it into the HTML file to connect to the database.</div>`;
-                    return;
-                }
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-                
-                onAuthStateChanged(auth, async (user) => {
-                    const loadingSpinner = document.getElementById('loading-spinner');
-                    const appContainer = document.getElementById('app-container');
-                    const authPage = document.getElementById('page-auth');
-
-                    if (user) {
-                        userId = user.uid;
-                        await setupListeners();
-                        loadingSpinner.style.display = 'none';
-                        authPage.classList.remove('active');
-                        appContainer.style.display = 'block';
-                        showPage('page-dashboard');
-                    } else {
-                        userId = null;
-                        loadingSpinner.style.display = 'none';
-                        appContainer.style.display = 'none';
-                        authPage.classList.add('active');
-                    }
-                });
-            } catch (error) {
-                console.error("Firebase initialization failed:", error);
-                document.getElementById('loading-spinner').innerHTML = `<div class="text-center text-red-400 p-4 max-w-sm"><strong>Database Connection Failed:</strong><br>Please double-check your firebaseConfig and Firebase project settings (Authentication, Firestore Rules).</div>`;
-            }
-        }
-        
-        // --- DATA LISTENERS ---
-        async function setupListeners() {
-            if (!userId) return;
-            const goalsRef = doc(db, `artifacts/${appId}/users/${userId}/goals`, "daily");
-            onSnapshot(goalsRef, (docSnap) => {
-                if (docSnap.exists()) { goals = { ...goals, ...docSnap.data() }; } else { setDoc(goalsRef, goals); }
-                updateGoalsUI();
-                updateDashboardUI(); 
-            });
-            const todayId = getTodayDateString();
-            const logRef = doc(db, `artifacts/${appId}/users/${userId}/dailyLogs`, todayId);
-            onSnapshot(logRef, (docSnap) => {
-                dailyLogData = docSnap.exists() ? docSnap.data() : { loggedMeals: [], loggedActivities: [] };
-                updateDashboardUI();
-            });
-            const mealsQuery = query(collection(db, `artifacts/${appId}/users/${userId}/meals`));
-            onSnapshot(mealsQuery, (querySnapshot) => {
-                allSavedMeals = [];
-                querySnapshot.forEach((doc) => allSavedMeals.push({ id: doc.id, ...doc.data() }));
-                renderSavedMeals();
-            });
-        }
-        
-        // --- UI RENDERING & UPDATES ---
-        function renderHistoryData(data) {
-            const loggedMeals = (data.loggedMeals || []).map(m => ({...m, type: 'meal'}));
-            const loggedActivities = (data.loggedActivities || []).map(a => ({...a, type: 'activity'}));
-            const combinedLog = [...loggedMeals, ...loggedActivities];
-            combinedLog.forEach(item => {
-                if (item.timestamp && item.timestamp.seconds) {
-                    item.jsDate = new Date(item.timestamp.seconds * 1000);
-                } else {
-                    item.jsDate = new Date();
-                }
-            });
-            combinedLog.sort((a, b) => b.jsDate - a.jsDate);
-            const totals = combinedLog.reduce((acc, item) => {
-                if(item.type === 'meal'){
-                    acc.caloriesIn += item.calories || 0;
-                    acc.protein += item.protein || 0;
-                } else if(item.type === 'activity') {
-                    acc.caloriesOut += item.calories || 0;
-                }
-                return acc;
-            }, { caloriesIn: 0, protein: 0, caloriesOut: 0 });
-            document.getElementById('history-calories-in').textContent = totals.caloriesIn;
-            document.getElementById('history-calories-out').textContent = totals.caloriesOut;
-            document.getElementById('history-protein').textContent = totals.protein;
-            const logListEl = document.getElementById('history-log-list');
-            if (combinedLog.length === 0) {
-                logListEl.innerHTML = '<p class="text-gray-500 text-center py-4">No entries for this day.</p>';
-                return;
-            }
-            logListEl.innerHTML = combinedLog.map(item => {
-                const time = item.jsDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                if (item.type === 'meal') {
-                    return `
-                        <div class="bg-gray-700 p-3 rounded-lg flex justify-between items-center">
-                            <div class="flex items-center gap-3">
-                                <span class="text-xl">🍳</span>
-                                <div>
-                                    <p class="font-medium">${item.name}</p>
-                                    <p class="text-xs text-gray-400">${item.calories} kcal &bull; ${item.protein}g protein &bull; ${time}</p>
-                                </div>
-                            </div>
-                            <button onclick="handleDeleteLogItem('${item.id}', 'meal')" class="p-2 rounded-full hover:bg-gray-600 transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>
-                            </button>
-                        </div>`;
-                } else { // Activity
-                     return `
-                        <div class="bg-gray-700 p-3 rounded-lg flex justify-between items-center">
-                            <div class="flex items-center gap-3">
-                                <span class="text-xl">🏃</span>
-                                <div>
-                                    <p class="font-medium">${item.description}</p>
-                                    <p class="text-xs text-gray-400">${item.calories} kcal burned &bull; ${time}</p>
-                                </div>
-                            </div>
-                            <button onclick="handleDeleteLogItem('${item.id}', 'activity')" class="p-2 rounded-full hover:bg-gray-600 transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>
-                            </button>
-                        </div>`;
-                }
-            }).join('');
-        }
-        function updateDashboardUI() {
-            const totalCaloriesIn = (dailyLogData.loggedMeals || []).reduce((acc, meal) => acc + (meal.calories || 0), 0);
-            const totalProtein = (dailyLogData.loggedMeals || []).reduce((acc, meal) => acc + (meal.protein || 0), 0);
-            const totalCaloriesOut = (dailyLogData.loggedActivities || []).reduce((acc, activity) => acc + (activity.calories || 0), 0);
-            document.getElementById('calories-in-value').textContent = totalCaloriesIn;
-            document.getElementById('protein-value').textContent = totalProtein;
-            document.getElementById('calories-out-value').textContent = totalCaloriesOut;
-            const calInPercent = goals.caloriesIn > 0 ? Math.min((totalCaloriesIn / goals.caloriesIn) * 100, 100) : 0;
-            const proteinPercent = goals.protein > 0 ? Math.min((totalProtein / goals.protein) * 100, 100) : 0;
-            const calOutPercent = goals.caloriesOut > 0 ? Math.min((totalCaloriesOut / goals.caloriesOut) * 100, 100) : 0;
-            document.getElementById('calories-in-circle').style.setProperty('--progress', `${calInPercent}%`);
-            document.getElementById('protein-circle').style.setProperty('--progress', `${proteinPercent}%`);
-            document.getElementById('calories-out-circle').style.setProperty('--progress', `${calOutPercent}%`);
-        }
-        function updateGoalsUI() {
-            document.getElementById('goal-calories-in').value = goals.caloriesIn;
-            document.getElementById('goal-calories-out').value = goals.caloriesOut;
-            document.getElementById('goal-protein').value = goals.protein;
-            document.getElementById('calories-in-goal').textContent = `Goal: ${goals.caloriesIn}`;
-            document.getElementById('calories-out-goal').textContent = `Goal: ${goals.caloriesOut}`;
-            document.getElementById('protein-goal').textContent = `Goal: ${goals.protein}g`;
-        }
-        function renderSavedMeals(filter = '') {
-            const listEl = document.getElementById('saved-meals-list');
-            if(!listEl) return;
-            listEl.innerHTML = '';
-            const filteredMeals = allSavedMeals.filter(meal => meal.name.toLowerCase().includes(filter.toLowerCase()));
-            if(filteredMeals.length === 0) {
-                listEl.innerHTML = `<p class="text-gray-500 text-center py-4">No meals found. Add one!</p>`;
-                return;
-            }
-            filteredMeals.forEach(meal => {
-                const mealEl = document.createElement('div');
-                mealEl.className = 'bg-gray-700 p-4 rounded-lg flex justify-between items-center';
-                mealEl.innerHTML = `
-                    <div class="flex-grow">
-                        <p class="font-semibold">${meal.name}</p>
-                        <p class="text-sm text-gray-400">${meal.calories} kcal &bull; ${meal.protein}g protein</p>
-                    </div>
-                    <div class="flex items-center gap-2 flex-shrink-0">
-                        <button class="bg-indigo-600 p-2 rounded-full hover:bg-indigo-500 transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
-                        </button>
-                        <button class="p-2 rounded-full hover:bg-gray-600 transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
-                        </button>
-                        <button class="p-2 rounded-full hover:bg-gray-600 transition">
-                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>
-                        </button>
-                    </div>`;
-                mealEl.querySelector('button.bg-indigo-600').onclick = () => logMeal(meal);
-                const editButton = mealEl.querySelectorAll('button')[1];
-                const deleteButton = mealEl.querySelectorAll('button')[2];
-                editButton.onclick = () => showEditMealModal(meal);
-                deleteButton.onclick = () => showConfirmDeleteModal(meal.id, meal.name);
-                listEl.appendChild(mealEl);
-            });
-        }
-        
-        // --- ACTIONS & EVENT HANDLERS ---
-        async function handleGoogleSignIn() {
-            const provider = new GoogleAuthProvider();
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (error) {
-                console.error("Google Sign-In failed:", error);
-                showToast("Sign in failed. Please try again.", "error");
-            }
-        }
-        async function handleSignOut() {
-            try {
-                await signOut(auth);
-            } catch (error) {
-                console.error("Sign Out failed:", error);
-                showToast("Sign out failed. Please try again.", "error");
-            }
-        }
-        async function handleSaveGoals() {
-            const newGoals = { caloriesIn: parseInt(document.getElementById('goal-calories-in').value) || 0, caloriesOut: parseInt(document.getElementById('goal-calories-out').value) || 0, protein: parseInt(document.getElementById('goal-protein').value) || 0 };
-            const goalsRef = doc(db, `artifacts/${appId}/users/${userId}/goals`, "daily");
-            await setDoc(goalsRef, newGoals);
-            showToast('Goals saved successfully!', 'success');
-            showPage('page-dashboard');
-        }
-        async function handleSaveNewMeal() {
-            const newMeal = { name: document.getElementById('new-meal-name').value.trim(), calories: parseInt(document.getElementById('new-meal-calories').value) || 0, protein: parseInt(document.getElementById('new-meal-protein').value) || 0, carbs: parseInt(document.getElementById('new-meal-carbs').value) || 0 };
-            if (!newMeal.name) { showToast('Meal name required.', 'error'); return; }
-            const mealsCollection = collection(db, `artifacts/${appId}/users/${userId}/meals`);
-            await addDoc(mealsCollection, newMeal);
-            showToast(`'${newMeal.name}' added to library.`, 'success');
-            ['new-meal-name', 'new-meal-calories', 'new-meal-protein', 'new-meal-carbs'].forEach(id => document.getElementById(id).value = '');
-            showPage('page-meal-logging');
-        }
-        async function logMeal(mealData) {
-            const todayId = getTodayDateString();
-            const logRef = doc(db, `artifacts/${appId}/users/${userId}/dailyLogs`, todayId);
-            const mealToLog = { ...mealData, id: crypto.randomUUID(), timestamp: new Date() };
-            const docSnap = await getDoc(logRef);
-            if (docSnap.exists()) {
-                const updatedMeals = [...(docSnap.data().loggedMeals || []), mealToLog];
-                await updateDoc(logRef, { loggedMeals: updatedMeals });
-            } else {
-                await setDoc(logRef, { loggedMeals: [mealToLog], loggedActivities: [] });
-            }
-            showToast(`${mealData.name} logged!`, 'success');
-            showPage('page-log-meal-selection');
-        }
-        async function handleSaveActivity() {
-            const caloriesOutValue = parseInt(document.getElementById('activity-calories-out').value) || 0;
-            const description = document.getElementById('activity-description').value.trim() || 'Activity';
-            if (caloriesOutValue <= 0) { showToast("Calories must be positive.", "error"); return; }
-            const todayId = getTodayDateString();
-            const logRef = doc(db, `artifacts/${appId}/users/${userId}/dailyLogs`, todayId);
-            const activityToLog = { id: crypto.randomUUID(), description, calories: caloriesOutValue, timestamp: new Date() };
-             const docSnap = await getDoc(logRef);
-            if (docSnap.exists()) {
-                const updatedActivities = [...(docSnap.data().loggedActivities || []), activityToLog];
-                await updateDoc(logRef, { loggedActivities: updatedActivities });
-            } else {
-                await setDoc(logRef, { loggedMeals: [], loggedActivities: [activityToLog] });
-            }
-            showToast("Activity logged!", "success");
-            hideActivityModal();
-        }
-        async function fetchAndRenderHistory(dateString) {
-            currentlyViewedDate = dateString;
-            const loadingEl = document.getElementById('history-loading');
-            const noDataEl = document.getElementById('history-no-data');
-            const contentEl = document.getElementById('history-content');
-            loadingEl.style.display = 'block';
-            noDataEl.style.display = 'none';
-            contentEl.style.display = 'none';
-            if (!userId) { loadingEl.style.display = 'none'; noDataEl.style.display = 'block'; return; }
-            const logRef = doc(db, `artifacts/${appId}/users/${userId}/dailyLogs`, dateString);
-            try {
-                const docSnap = await getDoc(logRef);
-                if (docSnap.exists()) { renderHistoryData(docSnap.data()); contentEl.style.display = 'block'; } else { noDataEl.style.display = 'block'; renderHistoryData({}); }
-            } catch (error) {
-                console.error("Error fetching history:", error);
-                showToast("Failed to load history.", "error");
-                noDataEl.style.display = 'block';
-            } finally {
-                loadingEl.style.display = 'none';
-            }
-        }
-        async function handleUpdateMeal() {
-            const mealId = document.getElementById('edit-meal-id').value;
-            const updatedMeal = { name: document.getElementById('edit-meal-name').value.trim(), calories: parseInt(document.getElementById('edit-meal-calories').value) || 0, protein: parseInt(document.getElementById('edit-meal-protein').value) || 0, carbs: parseInt(document.getElementById('edit-meal-carbs').value) || 0 };
-            if (!updatedMeal.name) { showToast('Meal name required.', 'error'); return; }
-            const mealRef = doc(db, `artifacts/${appId}/users/${userId}/meals`, mealId);
-            await updateDoc(mealRef, updatedMeal);
-            showToast("Meal updated!", "success");
-            hideEditMealModal();
-        }
-        async function deleteMeal(mealId) {
-            const mealRef = doc(db, `artifacts/${appId}/users/${userId}/meals`, mealId);
-            await deleteDoc(mealRef);
-            showToast("Meal deleted from library.", "success");
-            hideConfirmDeleteModal();
-        }
-        window.handleDeleteLogItem = async (itemId, itemType) => {
-            const logRef = doc(db, `artifacts/${appId}/users/${userId}/dailyLogs`, currentlyViewedDate);
-            const docSnap = await getDoc(logRef);
-            if(docSnap.exists()){
-                const data = docSnap.data();
-                if(itemType === 'meal'){
-                    const updatedMeals = (data.loggedMeals || []).filter(m => m.id !== itemId);
-                    await updateDoc(logRef, { loggedMeals: updatedMeals });
-                } else if(itemType === 'activity') {
-                    const updatedActivities = (data.loggedActivities || []).filter(a => a.id !== itemId);
-                    await updateDoc(logRef, { loggedActivities: updatedActivities });
-                }
-                showToast("Log entry removed!", "success");
-                fetchAndRenderHistory(currentlyViewedDate);
-            }
-        }
-
-        // --- NAVIGATION & UTILS ---
-        window.showPage = (pageId) => {
-            document.querySelectorAll('#app-container .page, #page-auth').forEach(p => p.classList.remove('active'));
-            const newPage = document.getElementById(pageId);
-            if (newPage) newPage.classList.add('active');
-            window.scrollTo(0, 0);
-        };
-        window.showHistoryPage = () => {
-            const datePicker = document.getElementById('history-date-picker');
-            datePicker.value = getTodayDateString();
-            datePicker.max = getTodayDateString();
-            showPage('page-history');
-            fetchAndRenderHistory(datePicker.value);
-        };
-        window.showMealLoggingPage = (category) => {
-            currentMealCategory = category;
-            document.getElementById('meal-category-title').textContent = category;
-            showPage('page-meal-logging');
-            renderSavedMeals();
-        };
-        window.showActivityModal = () => { 
-            document.getElementById('activity-description').value = '';
-            document.getElementById('activity-calories-out').value = '';
-            document.getElementById('activity-modal-backdrop').classList.add('active');
-            document.getElementById('activity-modal').classList.add('active');
-        };
-        window.hideActivityModal = () => { document.getElementById('activity-modal-backdrop').classList.remove('active'); document.getElementById('activity-modal').classList.remove('active'); };
-        window.showEditMealModal = (meal) => {
-            document.getElementById('edit-meal-id').value = meal.id;
-            document.getElementById('edit-meal-name').value = meal.name;
-            document.getElementById('edit-meal-calories').value = meal.calories;
-            document.getElementById('edit-meal-protein').value = meal.protein;
-            document.getElementById('edit-meal-carbs').value = meal.carbs;
-            document.getElementById('edit-meal-modal-backdrop').classList.add('active');
-            document.getElementById('edit-meal-modal').classList.add('active');
-        };
-        window.hideEditMealModal = () => {
-            document.getElementById('edit-meal-modal-backdrop').classList.remove('active');
-            document.getElementById('edit-meal-modal').classList.remove('active');
-        };
-        window.showConfirmDeleteModal = (mealId, mealName) => {
-            document.getElementById('confirm-delete-message').textContent = `Are you sure you want to permanently delete "${mealName}"? This action cannot be undone.`
-            document.getElementById('confirm-delete-btn').onclick = () => deleteMeal(mealId);
-            document.getElementById('confirm-delete-modal-backdrop').classList.add('active');
-            document.getElementById('confirm-delete-modal').classList.add('active');
-        };
-        window.hideConfirmDeleteModal = () => {
-            document.getElementById('confirm-delete-modal-backdrop').classList.remove('active');
-            document.getElementById('confirm-delete-modal').classList.remove('active');
-        };
         let toastTimer;
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
@@ -595,23 +302,782 @@
                 toast.classList.add('opacity-0', 'translate-y-4');
             }, 3000);
         }
+
+        // --- CONFIG & STATE ---
+        let db, auth, userId;
+        let currentMealCategory = '';
+        let goals = { caloriesIn: 2000, caloriesOut: 300, protein: 120 };
+        let userProfile = { name: '', age: null, weight: null, height: null, firstLogin: true };
+        let allSavedMeals = [];
+        let todayLogData = { loggedMeals: [], loggedActivities: [] };
+        let currentlyViewedDate = getTodayDateString();
+        let currentHistoryView = 'date';
+        let historyChartInstance;
+        let currentLogFilter = 'all';
+        let cachedHistoryData = [];
         
+        const firebaseConfig = {
+          apiKey: "AIzaSyB4qvUJZZJXDLntYXAtfxaoOCb3jnDo2Yk",
+    authDomain: "tracker-42811.firebaseapp.com",
+    projectId: "tracker-42811",
+    storageBucket: "tracker-42811.firebasestorage.app",
+    messagingSenderId: "985245635128",
+    appId: "1:985245635128:web:1b37ff6f84ba9dda3b8ccd",
+    measurementId: "G-74BBTD6JZY"
+        };
+        const appId = 'health-tracker-public';
+
+        // --- ALL APP FUNCTIONS ---
+        const app = {
+            initializeFirebase: async function() {
+                try {
+                    if (firebaseConfig.apiKey === "YOUR_API_KEY") {
+                        document.getElementById('loading-spinner').innerHTML = `<div class="text-center text-red-400 p-4 max-w-sm"><strong>Configuration Error:</strong><br>Please get your own free Firebase configuration object and paste it into the HTML file to connect to the database.</div>`;
+                        return;
+                    }
+                    const firebaseApp = initializeApp(firebaseConfig);
+                    db = getFirestore(firebaseApp);
+                    auth = getAuth(firebaseApp);
+                    
+                    onAuthStateChanged(auth, async (user) => {
+                        const loadingSpinner = document.getElementById('loading-spinner');
+                        const appContainer = document.getElementById('app-container');
+                        const authPage = document.getElementById('page-auth');
+
+                        if (user) {
+                            userId = user.uid;
+                            await this.setupListeners(user);
+                            loadingSpinner.style.display = 'none';
+                            authPage.classList.remove('active');
+                            appContainer.style.display = 'block';
+                            this.showPage('page-dashboard');
+                        } else {
+                            userId = null;
+                            loadingSpinner.style.display = 'none';
+                            appContainer.style.display = 'none';
+                            authPage.classList.add('active');
+                        }
+                    });
+                } catch (error) {
+                    console.error("Firebase initialization failed:", error);
+                    document.getElementById('loading-spinner').innerHTML = `<div class="text-center text-red-400 p-4 max-w-sm"><strong>Database Connection Failed:</strong><br>Please double-check your firebaseConfig and Firebase project settings.</div>`;
+                }
+            },
+            
+            setupListeners: async function(user) {
+                if (!userId) return;
+
+                const profileRef = doc(db, `artifacts/${appId}/users/${userId}/profile`, "details");
+                const profileSnap = await getDoc(profileRef);
+                if (profileSnap.exists()) {
+                    userProfile = profileSnap.data();
+                    document.getElementById('welcome-message').textContent = 'Welcome back';
+                } else {
+                    userProfile.name = user.displayName || 'User';
+                    await setDoc(profileRef, { ...userProfile, firstLogin: false });
+                    document.getElementById('welcome-message').textContent = 'Welcome';
+                }
+                document.getElementById('user-name').textContent = userProfile.name.split(' ')[0];
+                this.updateProfilePageUI();
+                
+                onSnapshot(profileRef, (docSnap) => {
+                    if(docSnap.exists()) userProfile = docSnap.data();
+                    document.getElementById('user-name').textContent = userProfile.name.split(' ')[0];
+                    this.updateProfilePageUI();
+                });
+
+                const goalsRef = doc(db, `artifacts/${appId}/users/${userId}/goals`, "daily");
+                onSnapshot(goalsRef, (docSnap) => {
+                    if (docSnap.exists()) { goals = { ...goals, ...docSnap.data() }; } else { setDoc(goalsRef, goals); }
+                    this.updateGoalsUI();
+                    this.updateDashboardUI(); 
+                });
+                const todayId = getTodayDateString();
+                const logRef = doc(db, `artifacts/${appId}/users/${userId}/dailyLogs`, todayId);
+                onSnapshot(logRef, (docSnap) => {
+                    todayLogData = docSnap.exists() ? docSnap.data() : { loggedMeals: [], loggedActivities: [] };
+                    this.updateDashboardUI();
+                });
+                const mealsQuery = query(collection(db, `artifacts/${appId}/users/${userId}/meals`));
+                onSnapshot(mealsQuery, (querySnapshot) => {
+                    allSavedMeals = [];
+                    querySnapshot.forEach((doc) => allSavedMeals.push({ id: doc.id, ...doc.data() }));
+                    this.renderSavedMeals();
+                });
+            },
+            
+            updateProfilePageUI: function() {
+                document.getElementById('profile-name').value = userProfile.name || '';
+                document.getElementById('profile-age').value = userProfile.age || '';
+                document.getElementById('profile-weight').value = userProfile.weight || '';
+                document.getElementById('profile-height').value = userProfile.height || '';
+            },
+            
+            renderHistoryView: function() {
+                const data = cachedHistoryData;
+
+                const totals = data.reduce((acc, item) => {
+                    if (item.type === 'meal') {
+                        acc.caloriesIn += item.calories || 0;
+                        acc.protein += item.protein || 0;
+                    } else if (item.type === 'activity') {
+                        acc.caloriesOut += item.calories || 0;
+                    }
+                    return acc;
+                }, { caloriesIn: 0, protein: 0, caloriesOut: 0 });
+
+                document.getElementById('history-calories-in').textContent = totals.caloriesIn;
+                document.getElementById('history-calories-out').textContent = totals.caloriesOut;
+                document.getElementById('history-protein').textContent = totals.protein;
+
+                this.renderHistoryChart(data, currentHistoryView);
+                this.renderFilteredLogList();
+            },
+
+            renderHistoryChart: function(data, viewMode) {
+                const chartContainer = document.getElementById('chart-container');
+                if (historyChartInstance) {
+                    historyChartInstance.destroy();
+                }
+
+                if (viewMode === 'date') {
+                    chartContainer.style.display = 'none';
+                    return;
+                }
+                chartContainer.style.display = 'block';
+
+                const ctx = document.getElementById('history-chart').getContext('2d');
+                let labels = [];
+                let caloriesInData = [];
+                let caloriesOutData = [];
+                let proteinData = [];
+
+                if (viewMode === 'week') {
+                    const today = new Date();
+                    const dayOfWeek = today.getDay(); // Sunday - 0, Monday - 1, ...
+                    const weekDates = [];
+                    for (let i = 0; i < 7; i++) {
+                        const d = new Date(today);
+                        d.setDate(d.getDate() - dayOfWeek + i);
+                        d.setHours(0,0,0,0);
+                        weekDates.push(d);
+                    }
+                    
+                    labels = weekDates.map(d => d.toLocaleDateString('en-US', { weekday: 'short' }));
+                    
+                    const dailyData = weekDates.map(d => {
+                        const dateString = d.toISOString().split('T')[0];
+                        const itemsForDay = data.filter(item => item.dateString === dateString);
+                        return itemsForDay.reduce((acc, item) => {
+                            if(item.type === 'meal') {
+                                acc.in += item.calories;
+                                acc.protein += item.protein;
+                            } else {
+                                acc.out += item.calories;
+                            }
+                            return acc;
+                        }, {in: 0, out: 0, protein: 0});
+                    });
+
+                    caloriesInData = dailyData.map(d => d.in);
+                    caloriesOutData = dailyData.map(d => d.out);
+                    proteinData = dailyData.map(d => d.protein);
+
+                } else if (viewMode === 'month' || viewMode === 'year') {
+                    let groups = {};
+                    
+                    if(viewMode === 'month') {
+                        const today = new Date();
+                        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+                        const getWeekOfMonth = (date) => {
+                            const adjustedDate = date.getDate() + firstDayOfMonth.getDay();
+                            return 'Week ' + Math.ceil(adjustedDate / 7);
+                        }
+                        data.forEach(item => {
+                            const groupKey = getWeekOfMonth(item.jsDate);
+                            if (!groups[groupKey]) groups[groupKey] = { in: 0, out: 0, protein: 0 };
+                            if (item.type === 'meal') {
+                                groups[groupKey].in += item.calories;
+                                groups[groupKey].protein += item.protein;
+                            } else {
+                                groups[groupKey].out += item.calories;
+                            }
+                        });
+                        labels = Object.keys(groups).sort();
+                    } else { // Year
+                         labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                         labels.forEach(l => groups[l] = { in: 0, out: 0, protein: 0 });
+                         data.forEach(item => {
+                            const monthName = item.jsDate.toLocaleDateString('en-US', { month: 'short' });
+                            if (groups[monthName]) {
+                                if (item.type === 'meal') {
+                                    groups[monthName].in += item.calories;
+                                    groups[monthName].protein += item.protein;
+                                } else {
+                                    groups[monthName].out += item.calories;
+                                }
+                            }
+                         });
+                    }
+
+                    caloriesInData = labels.map(key => groups[key] ? groups[key].in : 0);
+                    caloriesOutData = labels.map(key => groups[key] ? groups[key].out : 0);
+                    proteinData = labels.map(key => groups[key] ? groups[key].protein : 0);
+                }
+
+                historyChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            { label: 'Calories In', data: caloriesInData, backgroundColor: 'rgba(59, 130, 246, 0.7)', yAxisID: 'y' },
+                            { label: 'Calories Out', data: caloriesOutData, backgroundColor: 'rgba(239, 68, 68, 0.7)', yAxisID: 'y' },
+                            { label: 'Protein (g)', data: proteinData, backgroundColor: 'rgba(16, 185, 129, 0.7)', yAxisID: 'y1' }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { type: 'linear', position: 'left', beginAtZero: true, ticks: { color: '#9ca3af' }, grid: { color: '#374151' }, title: { display: true, text: 'Calories (kcal)', color: '#9ca3af'} },
+                            y1: { type: 'linear', position: 'right', beginAtZero: true, ticks: { color: '#9ca3af' }, grid: { drawOnChartArea: false }, title: { display: true, text: 'Protein (g)', color: '#9ca3af'}},
+                            x: { ticks: { color: '#9ca3af' }, grid: { color: '#374151' } }
+                        },
+                        plugins: {
+                            legend: { labels: { color: '#d1d5db' } }
+                        }
+                    }
+                });
+            },
+
+            renderFilteredLogList: function() {
+                const logListEl = document.getElementById('history-log-list');
+                const data = cachedHistoryData;
+                
+                const filteredData = data.filter(item => {
+                    if (currentLogFilter === 'all') return true;
+                    if (currentLogFilter === 'meals') return item.type === 'meal';
+                    if (currentLogFilter === 'activities') return item.type === 'activity';
+                    return false;
+                }).sort((a, b) => b.jsDate - a.jsDate);
+
+                if (filteredData.length === 0) {
+                    logListEl.innerHTML = `<p class="text-gray-500 text-center py-4">No ${currentLogFilter !== 'all' ? currentLogFilter : ''} logged for this period.</p>`;
+                    return;
+                }
+
+                logListEl.innerHTML = filteredData.map(item => {
+                    const time = item.jsDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const dateInfo = currentHistoryView !== 'date' ? ` &bull; ${item.jsDate.toLocaleDateString([], {month: 'short', day: 'numeric'})}` : '';
+                    if (item.type === 'meal') {
+                        return `<div class="bg-gray-700 p-3 rounded-lg flex justify-between items-center">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-xl">🍳</span>
+                                        <div>
+                                            <p class="font-medium">${item.name}</p>
+                                            <p class="text-xs text-gray-400">${item.calories} kcal &bull; ${item.protein}g protein &bull; ${time}${dateInfo}</p>
+                                        </div>
+                                    </div>
+                                    <button onclick="app.handleDeleteLogItem('${item.id}', 'meal', '${item.dateString}')" class="p-2 rounded-full hover:bg-gray-600 transition">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>
+                                    </button>
+                                </div>`;
+                    } else { 
+                         return `<div class="bg-gray-700 p-3 rounded-lg flex justify-between items-center">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-xl">🏃</span>
+                                        <div>
+                                            <p class="font-medium">${item.description}</p>
+                                            <p class="text-xs text-gray-400">${item.calories} kcal burned &bull; ${time}${dateInfo}</p>
+                                        </div>
+                                    </div>
+                                    <button onclick="app.handleDeleteLogItem('${item.id}', 'activity', '${item.dateString}')" class="p-2 rounded-full hover:bg-gray-600 transition">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>
+                                    </button>
+                                </div>`;
+                    }
+                }).join('');
+            },
+
+            setLogFilter: function(filter) {
+                currentLogFilter = filter;
+                const buttons = {
+                    all: document.getElementById('filter-all'),
+                    meals: document.getElementById('filter-meals'),
+                    activities: document.getElementById('filter-activities')
+                };
+                Object.values(buttons).forEach(b => b.classList.remove('bg-indigo-600', 'text-white'));
+                buttons[filter].classList.add('bg-indigo-600', 'text-white');
+                this.renderFilteredLogList();
+            },
+
+            updateDashboardUI: function() {
+                const totalCaloriesIn = (todayLogData.loggedMeals || []).reduce((acc, meal) => acc + (meal.calories || 0), 0);
+                const totalProtein = (todayLogData.loggedMeals || []).reduce((acc, meal) => acc + (meal.protein || 0), 0);
+                const totalCaloriesOut = (todayLogData.loggedActivities || []).reduce((acc, activity) => acc + (activity.calories || 0), 0);
+
+                document.getElementById('calories-in-value').textContent = totalCaloriesIn;
+                document.getElementById('protein-value').textContent = totalProtein;
+                document.getElementById('calories-out-value').textContent = totalCaloriesOut;
+
+                const calInPercent = goals.caloriesIn > 0 ? Math.min((totalCaloriesIn / goals.caloriesIn) * 100, 100) : 0;
+                const proteinPercent = goals.protein > 0 ? Math.min((totalProtein / goals.protein) * 100, 100) : 0;
+                const calOutPercent = goals.caloriesOut > 0 ? Math.min((totalCaloriesOut / goals.caloriesOut) * 100, 100) : 0;
+
+                document.getElementById('calories-in-circle').style.setProperty('--progress', `${calInPercent}%`);
+                document.getElementById('protein-circle').style.setProperty('--progress', `${proteinPercent}%`);
+                document.getElementById('calories-out-circle').style.setProperty('--progress', `${calOutPercent}%`);
+            },
+
+            updateGoalsUI: function() {
+                document.getElementById('goal-calories-in').value = goals.caloriesIn;
+                document.getElementById('goal-calories-out').value = goals.caloriesOut;
+                document.getElementById('goal-protein').value = goals.protein;
+                document.getElementById('calories-in-goal').textContent = `Goal: ${goals.caloriesIn}`;
+                document.getElementById('calories-out-goal').textContent = `Goal: ${goals.caloriesOut}`;
+                document.getElementById('protein-goal').textContent = `Goal: ${goals.protein}g`;
+            },
+
+            renderSavedMeals: function(filter = '') {
+                const listEl = document.getElementById('saved-meals-list');
+                if(!listEl) return;
+                listEl.innerHTML = '';
+                const filteredMeals = allSavedMeals.filter(meal => meal.name.toLowerCase().includes(filter.toLowerCase()));
+                if(filteredMeals.length === 0) {
+                    listEl.innerHTML = `<p class="text-gray-500 text-center py-4">No meals found. Add one!</p>`;
+                    return;
+                }
+                filteredMeals.forEach(meal => {
+                    const mealEl = document.createElement('div');
+                    mealEl.className = 'bg-gray-700 p-4 rounded-lg flex justify-between items-center';
+                    mealEl.innerHTML = `
+                        <div class="flex-grow">
+                            <p class="font-semibold">${meal.name}</p>
+                            <p class="text-sm text-gray-400">${meal.calories} kcal &bull; ${meal.protein}g protein</p>
+                        </div>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            <button class="bg-indigo-600 p-2 rounded-full hover:bg-indigo-500 transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                            </button>
+                            <button class="p-2 rounded-full hover:bg-gray-600 transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                            </button>
+                            <button class="p-2 rounded-full hover:bg-gray-600 transition">
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>
+                            </button>
+                        </div>`;
+                    mealEl.querySelector('button.bg-indigo-600').onclick = () => this.logMeal(meal);
+                    const editButton = mealEl.querySelectorAll('button')[1];
+                    const deleteButton = mealEl.querySelectorAll('button')[2];
+                    editButton.onclick = () => this.showEditMealModal(meal);
+                    deleteButton.onclick = () => this.showConfirmDeleteModal(meal.id, meal.name);
+                    listEl.appendChild(mealEl);
+                });
+            },
+            
+            handleGoogleSignIn: async function() {
+                const provider = new GoogleAuthProvider();
+                try {
+                    await signInWithPopup(auth, provider);
+                } catch (error) {
+                    console.error("Google Sign-In failed:", error);
+                    showToast("Sign in failed. Please try again.", "error");
+                }
+            },
+            handleSignOut: async function() {
+                try {
+                    await signOut(auth);
+                } catch (error) {
+                    console.error("Sign Out failed:", error);
+                    showToast("Sign out failed. Please try again.", "error");
+                }
+            },
+            handleSaveProfile: async function() {
+                const updatedProfile = {
+                    name: document.getElementById('profile-name').value.trim(),
+                    age: parseInt(document.getElementById('profile-age').value) || null,
+                    weight: parseInt(document.getElementById('profile-weight').value) || null,
+                    height: parseInt(document.getElementById('profile-height').value) || null,
+                };
+                const profileRef = doc(db, `artifacts/${appId}/users/${userId}/profile`, "details");
+                await setDoc(profileRef, updatedProfile, { merge: true });
+                showToast("Profile saved!", "success");
+            },
+            getMealNutrientsFromAI: async function() {
+                const btn = document.getElementById('get-ai-nutrients-btn');
+                const btnText = document.getElementById('ai-btn-text');
+                const iconLoading = document.getElementById('ai-icon-loading');
+                const description = document.getElementById('new-meal-name').value.trim();
+
+                if (!description) {
+                    showToast("Please enter a meal description first.", "error");
+                    return;
+                }
+
+                btn.disabled = true;
+                btnText.textContent = "Analyzing...";
+                iconLoading.style.display = 'block';
+                
+                const apiKey = "AIzaSyBbCsaIRA0s8u_slhFp2aWrISKPx5AwuzI"; 
+                
+                if (apiKey === "") {
+                     showToast("Gemini API key is missing in the code.", "error");
+                     btn.disabled = false;
+                     btnText.textContent = "Analyze with AI ✨";
+                     iconLoading.style.display = 'none';
+                     return;
+                }
+
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+                const systemPrompt = `You are a nutrition analysis expert. Analyze the user's meal description and estimate the nutritional information. Respond ONLY with a valid JSON object containing three keys: "calories", "protein", and "carbs", with numeric values. Do not add any other text, explanation, or markdown formatting. For example, for "2 boiled eggs and a slice of toast", you should return {"calories": 230, "protein": 13, "carbs": 15}.`;
+                
+                const payload = {
+                    contents: [{ parts: [{ text: description }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                };
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
+                    const result = await response.json();
+                    let text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    text = text.replace(/```json/g, '').replace(/```/g, '').trim(); 
+                    const nutrients = JSON.parse(text);
+
+                    document.getElementById('new-meal-calories').value = nutrients.calories || 0;
+                    document.getElementById('new-meal-protein').value = nutrients.protein || 0;
+                    document.getElementById('new-meal-carbs').value = nutrients.carbs || 0;
+                    showToast("Nutrients estimated!", "success");
+
+                } catch (error) {
+                    console.error("Gemini API call failed:", error);
+                    showToast("Could not analyze meal.", "error");
+                } finally {
+                    btn.disabled = false;
+                    btnText.textContent = "Analyze with AI ✨";
+                    iconLoading.style.display = 'none';
+                }
+            },
+            handleSaveGoals: async function() {
+                const newGoals = { caloriesIn: parseInt(document.getElementById('goal-calories-in').value) || 0, caloriesOut: parseInt(document.getElementById('goal-calories-out').value) || 0, protein: parseInt(document.getElementById('goal-protein').value) || 0 };
+                const goalsRef = doc(db, `artifacts/${appId}/users/${userId}/goals`, "daily");
+                await setDoc(goalsRef, newGoals);
+                showToast('Goals saved successfully!', 'success');
+                this.showPage('page-dashboard');
+            },
+            handleSaveNewMeal: async function() {
+                const newMeal = { name: document.getElementById('new-meal-name').value.trim(), calories: parseInt(document.getElementById('new-meal-calories').value) || 0, protein: parseInt(document.getElementById('new-meal-protein').value) || 0, carbs: parseInt(document.getElementById('new-meal-carbs').value) || 0 };
+                if (!newMeal.name) { showToast('Meal name required.', 'error'); return; }
+                const mealsCollection = collection(db, `artifacts/${appId}/users/${userId}/meals`);
+                await addDoc(mealsCollection, newMeal);
+                showToast(`'${newMeal.name}' added to library.`, 'success');
+                ['new-meal-name', 'new-meal-calories', 'new-meal-protein', 'new-meal-carbs'].forEach(id => document.getElementById(id).value = '');
+                this.showPage('page-meal-logging');
+            },
+            logMeal: async function(mealData) {
+                const dateString = document.getElementById('log-meal-date-picker').value;
+                const todayString = getTodayDateString();
+                const timeString = dateString === todayString ? new Date().toTimeString().split(' ')[0] : '12:00:00';
+                const logTimestamp = new Date(`${dateString}T${timeString}`);
+                const logRef = doc(db, `artifacts/${appId}/users/${userId}/dailyLogs`, dateString);
+                
+                const mealToLog = { ...mealData, id: crypto.randomUUID(), timestamp: logTimestamp, category: currentMealCategory };
+                const docSnap = await getDoc(logRef);
+                if (docSnap.exists()) {
+                    const updatedMeals = [...(docSnap.data().loggedMeals || []), mealToLog];
+                    await updateDoc(logRef, { loggedMeals: updatedMeals });
+                } else {
+                    await setDoc(logRef, { loggedMeals: [mealToLog], loggedActivities: [] });
+                }
+                showToast(`${mealData.name} logged!`, 'success');
+            },
+            handleSaveActivity: async function() {
+                const dateString = document.getElementById('log-activity-date-picker').value;
+                const caloriesOutValue = parseInt(document.getElementById('activity-calories-out').value) || 0;
+                const description = document.getElementById('activity-description').value.trim() || 'Activity';
+                if (caloriesOutValue <= 0) { showToast("Calories must be positive.", "error"); return; }
+
+                const todayString = getTodayDateString();
+                const timeString = dateString === todayString ? new Date().toTimeString().split(' ')[0] : '12:00:00';
+                const logTimestamp = new Date(`${dateString}T${timeString}`);
+
+                const logRef = doc(db, `artifacts/${appId}/users/${userId}/dailyLogs`, dateString);
+                const activityToLog = { id: crypto.randomUUID(), description, calories: caloriesOutValue, timestamp: logTimestamp };
+                 const docSnap = await getDoc(logRef);
+                if (docSnap.exists()) {
+                    const updatedActivities = [...(docSnap.data().loggedActivities || []), activityToLog];
+                    await updateDoc(logRef, { loggedActivities: updatedActivities });
+                } else {
+                    await setDoc(logRef, { loggedMeals: [], loggedActivities: [activityToLog] });
+                }
+                showToast("Activity logged!", "success");
+                this.hideActivityModal();
+                this.fetchAndRenderHistory();
+            },
+            fetchAndRenderHistory: async function() {
+                const loadingEl = document.getElementById('history-loading');
+                const noDataEl = document.getElementById('history-no-data');
+                const contentEl = document.getElementById('history-content');
+                loadingEl.style.display = 'block';
+                noDataEl.style.display = 'none';
+                contentEl.style.display = 'none';
+
+                if (!userId) { loadingEl.style.display = 'none'; noDataEl.style.display = 'block'; return; }
+                
+                let startDate, endDate;
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                if (currentHistoryView === 'date') {
+                    const selectedDate = new Date(currentlyViewedDate + 'T00:00:00');
+                    startDate = selectedDate;
+                    endDate = new Date(selectedDate);
+                    endDate.setDate(endDate.getDate() + 1);
+                } else if (currentHistoryView === 'week') {
+                    const dayOfWeek = today.getDay();
+                    startDate = new Date(today);
+                    startDate.setDate(today.getDate() - dayOfWeek);
+                    endDate = new Date(startDate);
+                    endDate.setDate(startDate.getDate() + 7);
+                } else if (currentHistoryView === 'month'){ 
+                    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                    endDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+                } else { // year
+                    startDate = new Date(today.getFullYear(), 0, 1);
+                    endDate = new Date(today.getFullYear() + 1, 0, 1);
+                }
+                
+                const logsCollection = collection(db, `artifacts/${appId}/users/${userId}/dailyLogs`);
+                const startDateStr = getLocalDateString(startDate);
+                const endDateStr = getLocalDateString(endDate);
+                const q = query(logsCollection, where(documentId(), '>=', startDateStr), where(documentId(), '<', endDateStr));
+
+                try {
+                    const querySnapshot = await getDocs(q);
+                    cachedHistoryData = [];
+                    querySnapshot.forEach(doc => {
+                        const data = doc.data();
+                        const dateString = doc.id;
+                        (data.loggedMeals || []).forEach(m => cachedHistoryData.push({ ...m, type: 'meal', dateString, jsDate: m.timestamp.toDate() }));
+                        (data.loggedActivities || []).forEach(a => cachedHistoryData.push({ ...a, type: 'activity', dateString, jsDate: a.timestamp.toDate() }));
+                    });
+                    
+                    document.getElementById('history-content').style.display = 'none'; 
+                    noDataEl.style.display = 'block';
+
+                    if (cachedHistoryData.length > 0) {
+                        this.renderHistoryView();
+                        contentEl.style.display = 'flex';
+                        contentEl.classList.add('flex-col');
+                        noDataEl.style.display = 'none';
+                    } else {
+                         if (historyChartInstance) historyChartInstance.destroy();
+                    }
+                } catch (error) {
+                    console.error("Error fetching history:", error);
+                    showToast("Failed to load history.", "error");
+                    noDataEl.style.display = 'block';
+                } finally {
+                    loadingEl.style.display = 'none';
+                }
+            },
+            handleUpdateMeal: async function() {
+                const mealId = document.getElementById('edit-meal-id').value;
+                const updatedMeal = {
+                    name: document.getElementById('edit-meal-name').value.trim(),
+                    calories: parseInt(document.getElementById('edit-meal-calories').value) || 0,
+                    protein: parseInt(document.getElementById('edit-meal-protein').value) || 0,
+                    carbs: parseInt(document.getElementById('edit-meal-carbs').value) || 0
+                };
+                if (!updatedMeal.name) { showToast('Meal name required.', 'error'); return; }
+                const mealRef = doc(db, `artifacts/${appId}/users/${userId}/meals`, mealId);
+                await updateDoc(mealRef, updatedMeal);
+                showToast("Meal updated!", "success");
+                this.hideEditMealModal();
+            },
+            deleteMeal: async function(mealId) {
+                const mealRef = doc(db, `artifacts/${appId}/users/${userId}/meals`, mealId);
+                await deleteDoc(mealRef);
+                showToast("Meal deleted from library.", "success");
+                this.hideConfirmDeleteModal();
+            },
+            
+            showPage: function(pageId) {
+                document.querySelectorAll('#app-container .page').forEach(p => p.classList.remove('active'));
+                const newPage = document.getElementById(pageId);
+                if (newPage) newPage.classList.add('active');
+
+                if (pageId === 'page-dashboard') {
+                    currentlyViewedDate = getTodayDateString();
+                    document.getElementById('dashboard-date-input').value = currentlyViewedDate;
+                }
+                
+                if(pageId === 'page-log-meal-selection') {
+                    const datePicker = document.getElementById('log-meal-date-picker');
+                    datePicker.value = currentlyViewedDate;
+                    datePicker.max = getTodayDateString();
+                }
+
+                window.scrollTo(0, 0);
+            },
+            showHistoryPage: function(filter = 'all', date = getTodayDateString()) {
+                currentlyViewedDate = date;
+                const datePicker = document.getElementById('history-date-picker');
+                datePicker.value = currentlyViewedDate;
+                datePicker.max = getTodayDateString();
+                
+                this.setLogFilter(filter);
+                this.setHistoryView('date');
+                this.showPage('page-history');
+            },
+            setHistoryView: function(view) {
+                currentHistoryView = view;
+                const buttons = {
+                    date: document.getElementById('history-view-date'),
+                    week: document.getElementById('history-view-week'),
+                    month: document.getElementById('history-view-month'),
+                    year: document.getElementById('history-view-year')
+                };
+                const datePickerContainer = document.getElementById('history-date-picker-container');
+                const logButtons = document.getElementById('history-log-buttons');
+
+                Object.values(buttons).forEach(b => b.classList.remove('bg-indigo-600', 'text-white'));
+                buttons[view].classList.add('bg-indigo-600', 'text-white');
+                
+                if (view === 'date') {
+                    datePickerContainer.style.display = 'block';
+                    logButtons.style.display = 'grid';
+                    currentlyViewedDate = document.getElementById('history-date-picker').value;
+                } else {
+                    datePickerContainer.style.display = 'none';
+                    logButtons.style.display = 'none';
+                }
+                this.fetchAndRenderHistory();
+            },
+            showMealLoggingPage: function(category) {
+                currentMealCategory = category;
+                document.getElementById('meal-category-title').textContent = category;
+                const dateString = new Date(currentlyViewedDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+                document.getElementById('log-date-display-logging').textContent = `For: ${dateString}`;
+                this.showPage('page-meal-logging');
+                this.renderSavedMeals();
+            },
+            showActivityModal: function() { 
+                document.getElementById('activity-description').value = '';
+                document.getElementById('activity-calories-out').value = '';
+                const datePicker = document.getElementById('log-activity-date-picker');
+                datePicker.value = currentlyViewedDate;
+                datePicker.max = getTodayDateString();
+                document.getElementById('activity-modal-backdrop').classList.add('active');
+                document.getElementById('activity-modal').classList.add('active');
+            },
+            hideActivityModal: function() { document.getElementById('activity-modal-backdrop').classList.remove('active'); document.getElementById('activity-modal').classList.remove('active'); },
+            
+            showEditMealModal: function(meal) {
+                document.getElementById('edit-meal-id').value = meal.id;
+                document.getElementById('edit-meal-name').value = meal.name;
+                document.getElementById('edit-meal-calories').value = meal.calories;
+                document.getElementById('edit-meal-protein').value = meal.protein;
+                document.getElementById('edit-meal-carbs').value = meal.carbs;
+                document.getElementById('edit-meal-modal-backdrop').classList.add('active');
+                document.getElementById('edit-meal-modal').classList.add('active');
+            },
+            hideEditMealModal: function() {
+                document.getElementById('edit-meal-modal-backdrop').classList.remove('active');
+                document.getElementById('edit-meal-modal').classList.remove('active');
+            },
+
+            showConfirmDeleteModal: function(mealId, mealName) {
+                document.getElementById('confirm-delete-message').textContent = `Are you sure you want to permanently delete "${mealName}"? This action cannot be undone.`
+                document.getElementById('confirm-delete-btn').onclick = () => this.deleteMeal(mealId);
+                document.getElementById('confirm-delete-modal-backdrop').classList.add('active');
+                document.getElementById('confirm-delete-modal').classList.add('active');
+            },
+            hideConfirmDeleteModal: function() {
+                document.getElementById('confirm-delete-modal-backdrop').classList.remove('active');
+                document.getElementById('confirm-delete-modal').classList.remove('active');
+            },
+            handleDeleteLogItem: async function(itemId, itemType, dateString) {
+                const logRef = doc(db, `artifacts/${appId}/users/${userId}/dailyLogs`, dateString);
+                const docSnap = await getDoc(logRef);
+                if(docSnap.exists()){
+                    const data = docSnap.data();
+                    if(itemType === 'meal'){
+                        const updatedMeals = (data.loggedMeals || []).filter(m => m.id !== itemId);
+                        await updateDoc(logRef, { loggedMeals: updatedMeals });
+                    } else if(itemType === 'activity') {
+                        const updatedActivities = (data.loggedActivities || []).filter(a => a.id !== itemId);
+                        await updateDoc(logRef, { loggedActivities: updatedActivities });
+                    }
+                    showToast("Log entry removed!", "success");
+                    this.fetchAndRenderHistory();
+                }
+            },
+            goBackFromMealSelection: function() {
+                const isViewingToday = currentlyViewedDate === getTodayDateString();
+                const cameFromDashboard = isViewingToday && currentHistoryView === 'date';
+                this.showPage(cameFromDashboard ? 'page-dashboard' : 'page-history');
+            }
+        };
+
         // --- BIND EVENTS ---
         document.addEventListener('DOMContentLoaded', () => {
-            initializeFirebase();
-            document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-            document.getElementById('google-signin-btn').addEventListener('click', handleGoogleSignIn);
-            document.getElementById('sign-out-btn').addEventListener('click', handleSignOut);
-            document.getElementById('save-goals-btn').addEventListener('click', handleSaveGoals);
-            document.getElementById('save-new-meal-btn').addEventListener('click', handleSaveNewMeal);
-            document.getElementById('search-meal-input').addEventListener('input', (e) => renderSavedMeals(e.target.value));
-            document.getElementById('save-activity-btn').addEventListener('click', handleSaveActivity);
-            document.getElementById('history-date-picker').addEventListener('change', (e) => fetchAndRenderHistory(e.target.value));
-            document.getElementById('save-updated-meal-btn').addEventListener('click', handleUpdateMeal);
-        });
+            app.initializeFirebase();
+            document.getElementById('today-date-display').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+            
+            window.app = app;
+            window.showPage = app.showPage.bind(app);
+            window.showHistoryPage = app.showHistoryPage.bind(app);
+            window.showProfilePage = () => app.showPage('page-profile');
+            window.showGoalsPage = () => app.showPage('page-goals');
+            window.showMealLoggingPage = app.showMealLoggingPage.bind(app);
+            window.showActivityModal = app.showActivityModal.bind(app);
+            window.hideActivityModal = app.hideActivityModal.bind(app);
+            window.hideEditMealModal = app.hideEditMealModal.bind(app);
+            window.hideConfirmDeleteModal = app.hideConfirmDeleteModal.bind(app);
+            window.goBackFromMealSelection = app.goBackFromMealSelection.bind(app);
+            
+            document.getElementById('google-signin-btn').addEventListener('click', () => app.handleGoogleSignIn());
+            document.getElementById('sign-out-btn').addEventListener('click', () => app.handleSignOut());
+            document.getElementById('save-profile-btn').addEventListener('click', () => app.handleSaveProfile());
+            document.getElementById('get-ai-nutrients-btn').addEventListener('click', () => app.getMealNutrientsFromAI());
+            document.getElementById('save-goals-btn').addEventListener('click', () => app.handleSaveGoals());
+            document.getElementById('save-new-meal-btn').addEventListener('click', () => app.handleSaveNewMeal());
+            document.getElementById('search-meal-input').addEventListener('input', (e) => app.renderSavedMeals(e.target.value));
+            document.getElementById('save-activity-btn').addEventListener('click', () => app.handleSaveActivity());
+            document.getElementById('log-meal-date-picker').addEventListener('change', (e) => {
+                currentlyViewedDate = e.target.value;
+                app.showPage('page-log-meal-selection');
+            });
+            document.getElementById('history-date-picker').addEventListener('change', (e) => {
+                currentlyViewedDate = e.target.value;
+                app.fetchAndRenderHistory();
+            });
+            document.getElementById('save-updated-meal-btn').addEventListener('click', () => app.handleUpdateMeal());
+            document.getElementById('history-view-date').addEventListener('click', () => app.setHistoryView('date'));
+            document.getElementById('history-view-week').addEventListener('click', () => app.setHistoryView('week'));
+            document.getElementById('history-view-month').addEventListener('click', () => app.setHistoryView('month'));
+            document.getElementById('history-view-year').addEventListener('click', () => app.setHistoryView('year'));
 
-        // Make functions globally accessible for inline onclick handlers
-        window.logMeal = logMeal;
+            document.getElementById('dashboard-card-calories-in').addEventListener('click', () => app.showHistoryPage('meals'));
+            document.getElementById('dashboard-card-calories-out').addEventListener('click', () => app.showHistoryPage('activities'));
+            document.getElementById('dashboard-card-protein').addEventListener('click', () => app.showHistoryPage('meals'));
+            document.getElementById('dashboard-date-input').addEventListener('change', (e) => {
+                app.showHistoryPage('all', e.target.value);
+            });
+
+            document.getElementById('filter-all').addEventListener('click', () => app.setLogFilter('all'));
+            document.getElementById('filter-meals').addEventListener('click', () => app.setLogFilter('meals'));
+            document.getElementById('filter-activities').addEventListener('click', () => app.setLogFilter('activities'));
+            document.getElementById('history-card-in').addEventListener('click', () => app.setLogFilter('meals'));
+            document.getElementById('history-card-protein').addEventListener('click', () => app.setLogFilter('meals'));
+            document.getElementById('history-card-out').addEventListener('click', () => app.setLogFilter('activities'));
+        });
     </script>
 </body>
 </html>
+
