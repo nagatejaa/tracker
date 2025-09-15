@@ -91,8 +91,8 @@
                 <div class="mb-4">
                     <label for="price-slider" class="block mb-2 text-sm font-medium text-gray-300">Price Range (INR)</label>
                     <div class="flex items-center gap-4">
-                        <input id="price-slider" type="range" min="50" max="500" value="150" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
-                        <input type="number" id="price-input" min="50" max="500" value="150" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-24 p-2">
+                        <input id="price-slider" type="range" min="0" max="500" value="150" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                        <input type="number" id="price-input" min="0" max="500" value="150" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-24 p-2">
                     </div>
                 </div>
 
@@ -474,7 +474,7 @@
                     labels = weekDates.map(d => d.toLocaleDateString('en-US', { weekday: 'short' }));
                     
                     const dailyData = weekDates.map(d => {
-                        const dateString = d.toISOString().split('T')[0];
+                        const dateString = getLocalDateString(d);
                         const itemsForDay = data.filter(item => item.dateString === dateString);
                         return itemsForDay.reduce((acc, item) => {
                             if(item.type === 'meal') {
@@ -755,8 +755,8 @@
                 }
 
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
-                const systemPrompt = `You are a helpful nutrition and recipe assistant for a user in India.
-                Provide 3 South Indian meal suggestions to help them meet a calorie goal of approximately ${calorieDeficit} calories.
+                const systemPrompt = `You are a helpful nutrition and recipe assistant for a user in South India who stays in a PG.
+                Provide 10 South Indian meal suggestions to help them meet a calorie goal of approximately ${calorieDeficit} calories.
                 The user's preferred price for the meal is around ${priceRange} INR.
                 Return your answer ONLY as a valid JSON array of objects. Do not include any other text, markdown, or explanations.
                 Each object must have these keys: "name" (string), "calories" (number), "protein" (number), and "description" (a brief string).`;
