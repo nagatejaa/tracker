@@ -317,13 +317,13 @@ const getTodayDateString = () => {
         let cachedHistoryData = [];
         
         const firebaseConfig = {
-          apiKey: "AIzaSyB4qvUJZZJXDLntYXAtfxaoOCb3jnDo2Yk",
-    authDomain: "tracker-42811.firebaseapp.com",
-    projectId: "tracker-42811",
-    storageBucket: "tracker-42811.firebasestorage.app",
-    messagingSenderId: "985245635128",
-    appId: "1:985245635128:web:1b37ff6f84ba9dda3b8ccd",
-    measurementId: "G-74BBTD6JZY"
+          apiKey: "",
+    authDomain: "",
+    projectId: "",
+    storageBucket: "",
+    messagingSenderId: "",
+    appId: "",
+    measurementId: ""
         };
         const appId = 'health-tracker-public';
 
@@ -718,7 +718,7 @@ const getTodayDateString = () => {
                 btnText.textContent = "Analyzing...";
                 iconLoading.style.display = 'block';
                 
-                const apiKey = "AIzaSyBbCsaIRA0s8u_slhFp2aWrISKPx5AwuzI"; 
+                const apiKey = ""; 
                 
                 if (apiKey === "") {
                      showToast("Gemini API key is missing in the code.", "error");
