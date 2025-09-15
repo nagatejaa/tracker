@@ -969,13 +969,23 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
-                    if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
+                    
+                    if (!response.ok) {
+                        let errorData;
+                        try {
+                            errorData = await response.json();
+                        } catch (e) {
+                            throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                        }
+                        throw new Error(`API Error: ${errorData.error?.message || JSON.stringify(errorData)}`);
+                    }
+
                     const result = await response.json();
                     const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
                     responseEl.textContent = text;
                 } catch (error) {
                     console.error("Gemini search failed:", error);
-                    responseEl.textContent = "Sorry, I couldn't find an answer to that. Please try again.";
+                    responseEl.textContent = error.message;
                 } finally {
                     btn.disabled = false;
                     btnText.textContent = "Search";
