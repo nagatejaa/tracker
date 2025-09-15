@@ -316,6 +316,32 @@
         import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, query, updateDoc, deleteDoc, where, getDocs, Timestamp, documentId } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- UTILITY FUNCTIONS ---
+
+        // --- UTILITY FUNCTIONS ---
+        const fetchWithRetry = async (url, options, maxRetries = 3) => {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) {
+                        return response; // Success
+                    }
+                    // Don't retry for client-side errors (like 400 Bad Request)
+                    if (response.status >= 400 && response.status < 500) {
+                        throw new Error(`Client Error: ${response.status} ${response.statusText}`);
+                    }
+                    // For server errors (5xx), we retry
+                    console.log(`Attempt ${i + 1} failed. Retrying...`);
+                } catch (error) {
+                    console.error(`Network error on attempt ${i + 1}:`, error);
+                }
+                // Wait before retrying with exponential backoff + jitter
+                const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+            throw new Error(`API call failed after ${maxRetries} attempts.`);
+        };
+
+        const getLocalDateString = (date = new Date()) => { //... rest of your functions
         const getLocalDateString = (date = new Date()) => {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -820,7 +846,7 @@
             };
 
                 try {
-                    const response = await fetch(apiUrl, {
+                    const response = await fetchWithRetry(apiUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
@@ -964,7 +990,7 @@
                 };
 
                 try {
-                    const response = await fetch(apiUrl, {
+                    const response = await fetchWithRetry(apiUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
