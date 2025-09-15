@@ -1,12 +1,9 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Health Tracker</title>
-    <!-- Preconnect to critical domains to speed up loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://www.gstatic.com">
@@ -14,7 +11,6 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chart.js for graphs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
@@ -37,6 +33,9 @@
         }
         .modal-backdrop.active, .modal.active { display: block; opacity: 1; }
         .modal.active { transform: translate(-50%, -50%); }
+        /* Simple fade-in animation */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.5s ease-in-out forwards; }
     </style>
 </head>
 <body class="bg-gray-900 text-white antialiased">
@@ -44,8 +43,7 @@
         <div class="animate-spin rounded-full h-20 w-20 border-b-2 border-indigo-400"></div>
     </div>
     
-    <!-- AUTHENTICATION PAGE -->
-     <div id="page-auth" class="page">
+    <div id="page-auth" class="page">
          <div class="flex flex-col items-center justify-center min-h-screen p-4 text-center">
              <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-indigo-400 mb-4" viewBox="0 0 20 20" fill="currentColor">
                  <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
@@ -61,7 +59,6 @@
 
     <div id="app-container" class="max-w-xl mx-auto p-4 md:p-6 min-h-screen hidden">
 
-        <!-- DASHBOARD PAGE -->
         <div id="page-dashboard" class="page">
             <header class="flex justify-between items-center mb-8">
                 <div>
@@ -86,32 +83,51 @@
                 <button onclick="showPage('page-log-meal-selection')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-4 rounded-xl shadow-lg transition-transform transform hover:scale-105 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.993.883L4 8v10a1 1 0 00.883.993L5 19h10a1 1 0 00.993-.883L16 18V8a1 1 0 00-.883-.993L15 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4z" /></svg>Log Meal</button>
                 <button onclick="showActivityModal()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-4 px-4 rounded-xl shadow-lg transition-transform transform hover:scale-105 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>Log Activity</button>
             </div>
+            
+             <div id="suggestions-section" class="mt-8 bg-gray-800 p-6 rounded-2xl hidden">
+                <h2 class="text-xl font-bold mb-4 text-gray-200">Need a boost? Try these! 💡</h2>
+                <p id="suggestions-prompt" class="text-sm text-gray-400 mb-4"></p>
+                
+                <div class="mb-4">
+                    <label for="price-slider" class="block mb-2 text-sm font-medium text-gray-300">Price Range (INR)</label>
+                    <div class="flex items-center gap-4">
+                        <input id="price-slider" type="range" min="50" max="500" value="150" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                        <input type="number" id="price-input" min="50" max="500" value="150" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg w-24 p-2">
+                    </div>
+                </div>
+
+                <button id="get-suggestions-btn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-xl flex items-center justify-center gap-2">
+                    <span id="suggestion-btn-text">Get Suggestions</span>
+                    <div id="suggestion-icon-loading" class="animate-spin rounded-full h-5 w-5 border-b-2 border-white hidden"></div>
+                </button>
+                
+                <div id="meal-suggestions-container" class="mt-6 space-y-3"></div>
+            </div>
+
             <div class="text-center text-gray-600 text-xs mt-8">
-                v4
+                v5
             </div>
         </div>
 
-        <!-- PROFILE PAGE -->
         <div id="page-profile" class="page">
              <header class="flex items-center mb-8"><button onclick="showPage('page-dashboard')" class="mr-4 p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-3xl font-bold text-gray-100">Your Profile</h1></header>
             <div class="space-y-6 bg-gray-800 p-6 rounded-2xl mb-6">
                 <h2 class="text-xl font-semibold text-gray-200 border-b border-gray-700 pb-3">Personal Details</h2>
                 <div><label for="profile-name" class="block mb-2 text-sm font-medium text-gray-300">Display Name</label><input type="text" id="profile-name" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
-                <div><label for="profile-age" class="block mb-2 text-sm font-medium text-gray-300">Age</label><input type="number" id="profile-age" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
-                <div><label for="profile-weight" class="block mb-2 text-sm font-medium text-gray-300">Weight (kg)</label><input type="number" id="profile-weight" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
-                <div><label for="profile-height" class="block mb-2 text-sm font-medium text-gray-300">Height (cm)</label><input type="number" id="profile-height" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                <div><label for="profile-age" class="block mb-2 text-sm font-medium text-gray-300">Age</label><input type="number" step="any" id="profile-age" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                <div><label for="profile-weight" class="block mb-2 text-sm font-medium text-gray-300">Weight (kg)</label><input type="number" step="any" id="profile-weight" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                <div><label for="profile-height" class="block mb-2 text-sm font-medium text-gray-300">Height (cm)</label><input type="number" step="any" id="profile-height" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
                 <button id="save-profile-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition-transform transform hover:scale-105">Save Profile</button>
             </div>
         </div>
 
-        <!-- GOALS PAGE -->
         <div id="page-goals" class="page">
             <header class="flex items-center mb-8"><button onclick="showPage('page-dashboard')" class="mr-4 p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-3xl font-bold text-gray-100">Settings</h1></header>
             <div class="space-y-6 bg-gray-800 p-6 rounded-2xl">
                 <h2 class="text-xl font-semibold text-gray-200 border-b border-gray-700 pb-3">Daily Goals</h2>
-                <div><label for="goal-calories-in" class="block mb-2 text-sm font-medium text-gray-300">Daily Calorie Intake Goal</label><input type="number" id="goal-calories-in" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., 2000"></div>
-                <div><label for="goal-calories-out" class="block mb-2 text-sm font-medium text-gray-300">Daily Calorie Burn Goal</label><input type="number" id="goal-calories-out" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., 500"></div>
-                <div><label for="goal-protein" class="block mb-2 text-sm font-medium text-gray-300">Daily Protein Intake Goal (grams)</label><input type="number" id="goal-protein" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., 150"></div>
+                <div><label for="goal-calories-in" class="block mb-2 text-sm font-medium text-gray-300">Daily Calorie Intake Goal</label><input type="number" step="any" id="goal-calories-in" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., 2000"></div>
+                <div><label for="goal-calories-out" class="block mb-2 text-sm font-medium text-gray-300">Daily Calorie Burn Goal</label><input type="number" step="any" id="goal-calories-out" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., 500"></div>
+                <div><label for="goal-protein" class="block mb-2 text-sm font-medium text-gray-300">Daily Protein Intake Goal (grams)</label><input type="number" step="any" id="goal-protein" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., 150"></div>
                 <button id="save-goals-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition-transform transform hover:scale-105">Save Goals</button>
             </div>
              <div class="mt-6 bg-gray-800 p-6 rounded-2xl">
@@ -120,7 +136,6 @@
             </div>
         </div>
         
-        <!-- HISTORY PAGE -->
         <div id="page-history" class="page">
             <header class="flex items-center mb-6"><button onclick="showPage('page-dashboard')" class="mr-4 p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-3xl font-bold text-gray-100">History</h1></header>
             
@@ -130,11 +145,11 @@
                     <button id="history-view-week" class="w-full py-2 text-sm font-medium rounded-md transition">This Week</button>
                     <button id="history-view-month" class="w-full py-2 text-sm font-medium rounded-md transition">This Month</button>
                     <button id="history-view-year" class="w-full py-2 text-sm font-medium rounded-md transition">This Year</button>
-                </div>
-                <div id="history-date-picker-container">
-                    <label for="history-date-picker" class="block text-sm font-medium text-gray-400 mb-2">Select a date to view</label>
-                    <input type="date" id="history-date-picker" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3">
-                </div>
+                 </div>
+                 <div id="history-date-picker-container">
+                     <label for="history-date-picker" class="block text-sm font-medium text-gray-400 mb-2">Select a date to view</label>
+                     <input type="date" id="history-date-picker" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3">
+                 </div>
             </div>
 
             <div id="history-data-container">
@@ -155,9 +170,9 @@
                         <div class="flex items-center justify-between mb-4">
                              <h2 id="history-log-title" class="text-xl font-semibold text-gray-300">Detailed Log</h2>
                              <div id="history-log-buttons" class="grid grid-cols-2 gap-2">
-                                <button onclick="showPage('page-log-meal-selection')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 rounded-lg flex items-center justify-center text-sm"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.993.883L4 8v10a1 1 0 00.883.993L5 19h10a1 1 0 00.993-.883L16 18V8a1 1 0 00-.883-.993L15 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4z" /></svg>Meal</button>
-                                <button onclick="showActivityModal()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-3 rounded-lg flex items-center justify-center text-sm"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>Activity</button>
-                            </div>
+                                 <button onclick="showPage('page-log-meal-selection')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 rounded-lg flex items-center justify-center text-sm"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.993.883L4 8v10a1 1 0 00.883.993L5 19h10a1 1 0 00.993-.883L16 18V8a1 1 0 00-.883-.993L15 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4z" /></svg>Meal</button>
+                                 <button onclick="showActivityModal()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-3 rounded-lg flex items-center justify-center text-sm"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>Activity</button>
+                             </div>
                         </div>
                         <div class="flex space-x-2 bg-gray-700 rounded-lg p-1 mb-4">
                            <button id="filter-all" class="w-full py-2 text-sm font-medium rounded-md transition">All</button>
@@ -170,7 +185,6 @@
             </div>
         </div>
 
-        <!-- LOG MEAL SELECTION PAGE -->
         <div id="page-log-meal-selection" class="page">
              <header class="flex items-center mb-8"><button onclick="goBackFromMealSelection()" class="mr-4 p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-3xl font-bold text-gray-100">Log a Meal</h1></header>
             <div class="bg-gray-800 p-4 rounded-2xl mb-6">
@@ -185,7 +199,6 @@
             </div>
         </div>
 
-        <!-- MEAL LOGGING PAGE -->
         <div id="page-meal-logging" class="page">
              <header class="flex items-center mb-6"><button onclick="showPage('page-log-meal-selection')" class="mr-4 p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-3xl font-bold text-gray-100">Log <span id="meal-category-title"></span></h1></header>
              <div id="log-date-display-logging" class="text-center text-indigo-400 -mt-4 mb-4"></div>
@@ -194,7 +207,6 @@
             <button onclick="showPage('page-add-new-meal')" class="w-full mt-6 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition-transform transform hover:scale-105">Add New Meal</button>
         </div>
 
-        <!-- ADD MEAL PAGE -->
         <div id="page-add-new-meal" class="page">
             <header class="flex items-center mb-8"><button onclick="showPage('page-meal-logging')" class="mr-4 p-2 rounded-full hover:bg-gray-800"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button><h1 class="text-3xl font-bold text-gray-100">Add a New Meal</h1></header>
              <div id="log-date-display-add" class="text-center text-indigo-400 -mt-6 mb-4"></div>
@@ -208,35 +220,33 @@
                     </button>
                 </div>
                  <p class="text-center text-gray-500 text-xs">Or enter details manually below</p>
-                <div><label for="new-meal-calories" class="block mb-2 text-sm font-medium text-gray-300">Calories (kcal)</label><input type="number" id="new-meal-calories" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
-                <div><label for="new-meal-protein" class="block mb-2 text-sm font-medium text-gray-300">Protein (g)</label><input type="number" id="new-meal-protein" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
-                <div><label for="new-meal-carbs" class="block mb-2 text-sm font-medium text-gray-300">Carbohydrates (g)</label><input type="number" id="new-meal-carbs" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                <div><label for="new-meal-calories" class="block mb-2 text-sm font-medium text-gray-300">Calories (kcal)</label><input type="number" step="any" id="new-meal-calories" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                <div><label for="new-meal-protein" class="block mb-2 text-sm font-medium text-gray-300">Protein (g)</label><input type="number" step="any" id="new-meal-protein" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                <div><label for="new-meal-carbs" class="block mb-2 text-sm font-medium text-gray-300">Carbohydrates (g)</label><input type="number" step="any" id="new-meal-carbs" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
                 <button id="save-new-meal-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition-transform transform hover:scale-105">Save Meal to Library</button>
             </div>
         </div>
     </div>
     
-    <!-- ACTIVITY LOG MODAL -->
-     <div id="activity-modal-backdrop" class="modal-backdrop"></div>
+    <div id="activity-modal-backdrop" class="modal-backdrop"></div>
      <div id="activity-modal" class="modal w-full max-w-sm">
          <div class="bg-gray-800 rounded-2xl shadow-lg p-6">
              <h2 class="text-2xl font-bold mb-4">Log Activity</h2>
               <div class="space-y-4">
-                 <div>
-                    <label for="log-activity-date-picker" class="block text-sm font-medium text-gray-400 mb-2">Log activity for date:</label>
-                    <input type="date" id="log-activity-date-picker" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3 mb-4">
-                 </div>
-                 <div><label for="activity-description" class="block mb-2 text-sm font-medium text-gray-300">Description</label><input type="text" id="activity-description" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., Morning Run"></div>
-                 <div><label for="activity-calories-out" class="block mb-2 text-sm font-medium text-gray-300">Calories Burned (kcal)</label><input type="number" id="activity-calories-out" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., 300"></div>
-            </div>
-             <div class="flex justify-end gap-3 mt-6">
-                 <button onclick="hideActivityModal()" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium transition">Cancel</button>
-                 <button id="save-activity-btn" class="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-sm font-medium transition">Save Activity</button>
+                  <div>
+                      <label for="log-activity-date-picker" class="block text-sm font-medium text-gray-400 mb-2">Log activity for date:</label>
+                      <input type="date" id="log-activity-date-picker" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3 mb-4">
+                  </div>
+                  <div><label for="activity-description" class="block mb-2 text-sm font-medium text-gray-300">Description</label><input type="text" id="activity-description" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., Morning Run"></div>
+                  <div><label for="activity-calories-out" class="block mb-2 text-sm font-medium text-gray-300">Calories Burned (kcal)</label><input type="number" step="any" id="activity-calories-out" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3" placeholder="e.g., 300"></div>
              </div>
+              <div class="flex justify-end gap-3 mt-6">
+                  <button onclick="hideActivityModal()" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium transition">Cancel</button>
+                  <button id="save-activity-btn" class="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-sm font-medium transition">Save Activity</button>
+              </div>
          </div>
      </div>
 
-     <!-- EDIT MEAL MODAL -->
      <div id="edit-meal-modal-backdrop" class="modal-backdrop"></div>
      <div id="edit-meal-modal" class="modal w-full max-w-sm">
          <div class="bg-gray-800 rounded-2xl shadow-lg p-6">
@@ -244,9 +254,9 @@
              <input type="hidden" id="edit-meal-id">
              <div class="space-y-4">
                  <div><label for="edit-meal-name" class="block mb-2 text-sm font-medium text-gray-300">Meal Name</label><input type="text" id="edit-meal-name" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
-                 <div><label for="edit-meal-calories" class="block mb-2 text-sm font-medium text-gray-300">Calories (kcal)</label><input type="number" id="edit-meal-calories" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
-                 <div><label for="edit-meal-protein" class="block mb-2 text-sm font-medium text-gray-300">Protein (g)</label><input type="number" id="edit-meal-protein" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
-                 <div><label for="edit-meal-carbs" class="block mb-2 text-sm font-medium text-gray-300">Carbohydrates (g)</label><input type="number" id="edit-meal-carbs" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                 <div><label for="edit-meal-calories" class="block mb-2 text-sm font-medium text-gray-300">Calories (kcal)</label><input type="number" step="any" id="edit-meal-calories" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                 <div><label for="edit-meal-protein" class="block mb-2 text-sm font-medium text-gray-300">Protein (g)</label><input type="number" step="any" id="edit-meal-protein" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                 <div><label for="edit-meal-carbs" class="block mb-2 text-sm font-medium text-gray-300">Carbohydrates (g)</label><input type="number" step="any" id="edit-meal-carbs" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
              </div>
              <div class="flex justify-end gap-3 mt-6">
                   <button onclick="hideEditMealModal()" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium transition">Cancel</button>
@@ -255,7 +265,6 @@
          </div>
      </div>
 
-     <!-- CONFIRM DELETE MODAL -->
      <div id="confirm-delete-modal-backdrop" class="modal-backdrop"></div>
      <div id="confirm-delete-modal" class="modal w-full max-w-sm">
          <div class="bg-gray-800 rounded-2xl shadow-lg p-6">
@@ -268,27 +277,24 @@
          </div>
      </div>
 
-    <!-- Custom Toast Notification -->
     <div id="toast" class="fixed bottom-5 right-5 bg-green-500 text-white py-2 px-4 rounded-lg shadow-md transition-all duration-300 opacity-0 transform translate-y-4"><p id="toast-message"></p></div>
 
-    <!-- Firebase -->
     <script type="module" defer>
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, query, updateDoc, deleteDoc, where, getDocs, Timestamp, documentId } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- UTILITY FUNCTIONS ---
-        // --- UTILITY FUNCTIONS ---
-const getLocalDateString = (date = new Date()) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-};
+        const getLocalDateString = (date = new Date()) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
 
-const getTodayDateString = () => {
-    return getLocalDateString(new Date());
-};
+        const getTodayDateString = () => {
+            return getLocalDateString(new Date());
+        };
 
         let toastTimer;
         function showToast(message, type = 'success') {
@@ -319,7 +325,7 @@ const getTodayDateString = () => {
         let cachedHistoryData = [];
         
         const firebaseConfig = {
-          apiKey: "AIzaSyB4qvUJZZJXDLntYXAtfxaoOCb3jnDo2Yk",
+    apiKey: "AIzaSyB4qvUJZZJXDLntYXAtfxaoOCb3jnDo2Yk",
     authDomain: "tracker-42811.firebaseapp.com",
     projectId: "tracker-42811",
     storageBucket: "tracker-42811.firebasestorage.app",
@@ -618,9 +624,9 @@ const getTodayDateString = () => {
                 const totalProtein = (todayLogData.loggedMeals || []).reduce((acc, meal) => acc + (meal.protein || 0), 0);
                 const totalCaloriesOut = (todayLogData.loggedActivities || []).reduce((acc, activity) => acc + (activity.calories || 0), 0);
 
-                document.getElementById('calories-in-value').textContent = totalCaloriesIn;
-                document.getElementById('protein-value').textContent = totalProtein;
-                document.getElementById('calories-out-value').textContent = totalCaloriesOut;
+                document.getElementById('calories-in-value').textContent = totalCaloriesIn.toFixed(1);
+                document.getElementById('protein-value').textContent = totalProtein.toFixed(1);
+                document.getElementById('calories-out-value').textContent = totalCaloriesOut.toFixed(1);
 
                 const calInPercent = goals.caloriesIn > 0 ? Math.min((totalCaloriesIn / goals.caloriesIn) * 100, 100) : 0;
                 const proteinPercent = goals.protein > 0 ? Math.min((totalProtein / goals.protein) * 100, 100) : 0;
@@ -629,6 +635,18 @@ const getTodayDateString = () => {
                 document.getElementById('calories-in-circle').style.setProperty('--progress', `${calInPercent}%`);
                 document.getElementById('protein-circle').style.setProperty('--progress', `${proteinPercent}%`);
                 document.getElementById('calories-out-circle').style.setProperty('--progress', `${calOutPercent}%`);
+
+                // Show/hide meal suggestions based on deficit
+                const suggestionsSection = document.getElementById('suggestions-section');
+                const suggestionsPrompt = document.getElementById('suggestions-prompt');
+                const calorieDeficit = goals.caloriesIn - totalCaloriesIn;
+
+                if (calorieDeficit > 300) {
+                    suggestionsSection.style.display = 'block';
+                    suggestionsPrompt.textContent = `You have a deficit of about ${Math.round(calorieDeficit)} calories. Here are some ideas to help you reach your goal.`;
+                } else {
+                    suggestionsSection.style.display = 'none';
+                }
             },
 
             updateGoalsUI: function() {
@@ -697,13 +715,88 @@ const getTodayDateString = () => {
             handleSaveProfile: async function() {
                 const updatedProfile = {
                     name: document.getElementById('profile-name').value.trim(),
-                    age: parseInt(document.getElementById('profile-age').value) || null,
-                    weight: parseInt(document.getElementById('profile-weight').value) || null,
-                    height: parseInt(document.getElementById('profile-height').value) || null,
+                    age: parseFloat(document.getElementById('profile-age').value) || null,
+                    weight: parseFloat(document.getElementById('profile-weight').value) || null,
+                    height: parseFloat(document.getElementById('profile-height').value) || null,
                 };
                 const profileRef = doc(db, `artifacts/${appId}/users/${userId}/profile`, "details");
                 await setDoc(profileRef, updatedProfile, { merge: true });
                 showToast("Profile saved!", "success");
+            },
+            getMealSuggestions: async function() {
+                const btn = document.getElementById('get-suggestions-btn');
+                const btnText = document.getElementById('suggestion-btn-text');
+                const iconLoading = document.getElementById('suggestion-icon-loading');
+                const suggestionsContainer = document.getElementById('meal-suggestions-container');
+
+                const totalCaloriesIn = (todayLogData.loggedMeals || []).reduce((acc, meal) => acc + (meal.calories || 0), 0);
+                const calorieDeficit = Math.round(goals.caloriesIn - totalCaloriesIn);
+                const priceRange = document.getElementById('price-input').value;
+
+                if (calorieDeficit <= 100) {
+                    showToast("You're close to your goal! No suggestions needed.", "success");
+                    return;
+                }
+
+                btn.disabled = true;
+                btnText.textContent = "Thinking...";
+                iconLoading.style.display = 'block';
+                suggestionsContainer.innerHTML = '';
+
+                // ❗ PASTE YOUR GOOGLE GEMINI API KEY HERE ❗
+                const apiKey = "AIzaSyBbCsaIRA0s8u_slhFp2aWrISKPx5AwuzI"; 
+
+                if (apiKey === "") {
+                    showToast("Gemini API key is missing in the code.", "error");
+                    btn.disabled = false;
+                    btnText.textContent = "Get Suggestions";
+                    iconLoading.style.display = 'none';
+                    return;
+                }
+
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+                const systemPrompt = `You are a helpful nutrition and recipe assistant for a user in India.
+                Provide 3 South Indian meal suggestions to help them meet a calorie goal of approximately ${calorieDeficit} calories.
+                The user's preferred price for the meal is around ${priceRange} INR.
+                Return your answer ONLY as a valid JSON array of objects. Do not include any other text, markdown, or explanations.
+                Each object must have these keys: "name" (string), "calories" (number), "protein" (number), and "description" (a brief string).`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: `Generate meals for ${calorieDeficit} calories.` }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                };
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
+                    const result = await response.json();
+                    let text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                    const suggestions = JSON.parse(text);
+
+                    suggestions.forEach(meal => {
+                        const mealEl = document.createElement('div');
+                        mealEl.className = 'bg-gray-700 p-4 rounded-lg animate-fade-in';
+                        mealEl.innerHTML = `
+                            <p class="font-bold text-lg text-emerald-300">${meal.name}</p>
+                            <p class="text-sm font-medium text-gray-300">${meal.calories} kcal &bull; ${meal.protein}g protein</p>
+                            <p class="text-xs text-gray-400 mt-1">${meal.description}</p>
+                        `;
+                        suggestionsContainer.appendChild(mealEl);
+                    });
+
+                } catch (error) {
+                    console.error("Gemini suggestion failed:", error);
+                    suggestionsContainer.innerHTML = `<p class="text-center text-red-400">Could not fetch suggestions.</p>`;
+                } finally {
+                    btn.disabled = false;
+                    btnText.textContent = "Get Suggestions";
+                    iconLoading.style.display = 'none';
+                }
             },
             getMealNutrientsFromAI: async function() {
                 const btn = document.getElementById('get-ai-nutrients-btn');
@@ -719,9 +812,9 @@ const getTodayDateString = () => {
                 btn.disabled = true;
                 btnText.textContent = "Analyzing...";
                 iconLoading.style.display = 'block';
-                
-                const apiKey = "AIzaSyBbCsaIRA0s8u_slhFp2aWrISKPx5AwuzI"; 
-                
+
+                const apiKey = "AIzaSyBbCsaIRA0s8u_slhFp2aWrISKPx5AwuzI"; // ❗ PASTE YOUR GOOGLE GEMINI API KEY HERE TOO ❗
+
                 if (apiKey === "") {
                      showToast("Gemini API key is missing in the code.", "error");
                      btn.disabled = false;
@@ -765,14 +858,14 @@ const getTodayDateString = () => {
                 }
             },
             handleSaveGoals: async function() {
-                const newGoals = { caloriesIn: parseInt(document.getElementById('goal-calories-in').value) || 0, caloriesOut: parseInt(document.getElementById('goal-calories-out').value) || 0, protein: parseInt(document.getElementById('goal-protein').value) || 0 };
+                const newGoals = { caloriesIn: parseFloat(document.getElementById('goal-calories-in').value) || 0, caloriesOut: parseFloat(document.getElementById('goal-calories-out').value) || 0, protein: parseFloat(document.getElementById('goal-protein').value) || 0 };
                 const goalsRef = doc(db, `artifacts/${appId}/users/${userId}/goals`, "daily");
                 await setDoc(goalsRef, newGoals);
                 showToast('Goals saved successfully!', 'success');
                 this.showPage('page-dashboard');
             },
             handleSaveNewMeal: async function() {
-                const newMeal = { name: document.getElementById('new-meal-name').value.trim(), calories: parseInt(document.getElementById('new-meal-calories').value) || 0, protein: parseInt(document.getElementById('new-meal-protein').value) || 0, carbs: parseInt(document.getElementById('new-meal-carbs').value) || 0 };
+                const newMeal = { name: document.getElementById('new-meal-name').value.trim(), calories: parseFloat(document.getElementById('new-meal-calories').value) || 0, protein: parseFloat(document.getElementById('new-meal-protein').value) || 0, carbs: parseFloat(document.getElementById('new-meal-carbs').value) || 0 };
                 if (!newMeal.name) { showToast('Meal name required.', 'error'); return; }
                 const mealsCollection = collection(db, `artifacts/${appId}/users/${userId}/meals`);
                 await addDoc(mealsCollection, newMeal);
@@ -799,7 +892,7 @@ const getTodayDateString = () => {
             },
             handleSaveActivity: async function() {
                 const dateString = document.getElementById('log-activity-date-picker').value;
-                const caloriesOutValue = parseInt(document.getElementById('activity-calories-out').value) || 0;
+                const caloriesOutValue = parseFloat(document.getElementById('activity-calories-out').value) || 0;
                 const description = document.getElementById('activity-description').value.trim() || 'Activity';
                 if (caloriesOutValue <= 0) { showToast("Calories must be positive.", "error"); return; }
 
@@ -891,9 +984,9 @@ const getTodayDateString = () => {
                 const mealId = document.getElementById('edit-meal-id').value;
                 const updatedMeal = {
                     name: document.getElementById('edit-meal-name').value.trim(),
-                    calories: parseInt(document.getElementById('edit-meal-calories').value) || 0,
-                    protein: parseInt(document.getElementById('edit-meal-protein').value) || 0,
-                    carbs: parseInt(document.getElementById('edit-meal-carbs').value) || 0
+                    calories: parseFloat(document.getElementById('edit-meal-calories').value) || 0,
+                    protein: parseFloat(document.getElementById('edit-meal-protein').value) || 0,
+                    carbs: parseFloat(document.getElementById('edit-meal-carbs').value) || 0
                 };
                 if (!updatedMeal.name) { showToast('Meal name required.', 'error'); return; }
                 const mealRef = doc(db, `artifacts/${appId}/users/${userId}/meals`, mealId);
@@ -1078,8 +1171,18 @@ const getTodayDateString = () => {
             document.getElementById('history-card-in').addEventListener('click', () => app.setLogFilter('meals'));
             document.getElementById('history-card-protein').addEventListener('click', () => app.setLogFilter('meals'));
             document.getElementById('history-card-out').addEventListener('click', () => app.setLogFilter('activities'));
+            
+            // New Listeners for suggestions
+            document.getElementById('get-suggestions-btn').addEventListener('click', () => app.getMealSuggestions());
+            const priceSlider = document.getElementById('price-slider');
+            const priceInput = document.getElementById('price-input');
+            priceSlider.addEventListener('input', (e) => {
+                priceInput.value = e.target.value;
+            });
+            priceInput.addEventListener('input', (e) => {
+                priceSlider.value = e.target.value;
+            });
         });
     </script>
 </body>
 </html>
-
