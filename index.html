@@ -142,6 +142,13 @@
                 <h2 class="text-xl font-semibold text-gray-200 border-b border-gray-700 pb-3">Account</h2>
                 <button id="sign-out-btn" class="w-full mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl transition-transform transform hover:scale-105">Sign Out</button>
             </div>
+            <div class="mt-6 bg-gray-800 p-6 rounded-2xl">
+            <h2 class="text-xl font-semibold text-gray-200 border-b border-gray-700 pb-3">Meal Library</h2>
+            <p class="text-sm text-gray-400 mt-3 mb-4">Organize all of your saved meals into categories here.</p>
+            <button id="manage-meals-btn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-xl">Manage My Meals</button>
+            <div id="meal-library-container" class="mt-4 space-y-3 hidden max-h-[50vh] overflow-y-auto pr-2">
+                </div>
+        </div>
         </div>
         
         <div id="page-history" class="page">
@@ -704,98 +711,94 @@
                 document.getElementById('calories-out-goal').textContent = `Goal: ${goals.caloriesOut}`;
                 document.getElementById('protein-goal').textContent = `Goal: ${goals.protein}g`;
             },
+            // Add these two new functions inside the app = { ... } object
+        renderMealLibrary: function() {
+            const container = document.getElementById('meal-library-container');
+            container.innerHTML = ''; // Clear old content
+            container.classList.remove('hidden');
 
-            renderSavedMeals: function(filter = '') {
-                const listEl = document.getElementById('saved-meals-list');
-                if (!listEl) return;
-                listEl.innerHTML = ''; // Clear previous content
+            if (allSavedMeals.length === 0) {
+                container.innerHTML = `<p class="text-gray-500 text-center py-4">Your library is empty. Add some meals!</p>`;
+                return;
+            }
 
-                const searchTerm = filter.toLowerCase();
+            allSavedMeals.forEach(meal => {
+                const mealEl = document.createElement('div');
+                mealEl.className = 'bg-gray-700 p-4 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3';
+                
+                const infoHtml = `
+                    <div>
+                        <p class="font-semibold">${meal.name}</p>
+                        <p class="text-sm text-gray-400">${meal.calories} kcal &bull; ${meal.protein}g protein</p>
+                    </div>
+                `;
 
-                const mealsForCategory = allSavedMeals.filter(meal => meal.category === currentMealCategory && meal.name.toLowerCase().includes(searchTerm));
-                const uncategorizedMeals = allSavedMeals.filter(meal => !meal.category && meal.name.toLowerCase().includes(searchTerm));
+                const selectHtml = `
+                    <select onchange="app.handleUpdateMealCategory('${meal.id}', this.value)" class="bg-gray-800 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:w-auto p-2">
+                        <option value="Uncategorized" ${!meal.category || meal.category === 'Uncategorized' ? 'selected' : ''}>Uncategorized</option>
+                        <option value="Breakfast" ${meal.category === 'Breakfast' ? 'selected' : ''}>Breakfast</option>
+                        <option value="Lunch" ${meal.category === 'Lunch' ? 'selected' : ''}>Lunch</option>
+                        <option value="Dinner" ${meal.category === 'Dinner' ? 'selected' : ''}>Dinner</option>
+                        <option value="Snacks" ${meal.category === 'Snacks' ? 'selected' : ''}>Snacks</option>
+                    </select>
+                `;
 
-                // Helper to create the standard 3-button controls (Log, Edit, Delete)
-                const createControls = (meal) => {
-                    const controlsDiv = document.createElement('div');
-                    controlsDiv.className = 'flex items-center gap-2 flex-shrink-0';
-                    
-                    const logBtn = document.createElement('button');
-                    logBtn.className = 'bg-indigo-600 p-2 rounded-full hover:bg-indigo-500 transition';
-                    logBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>`;
-                    logBtn.onclick = () => this.logMeal(meal, currentMealCategory);
-                    
-                    const editBtn = document.createElement('button');
-                    editBtn.className = 'p-2 rounded-full hover:bg-gray-600 transition';
-                    editBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>`;
-                    editBtn.onclick = () => this.showEditMealModal(meal);
+                mealEl.innerHTML = infoHtml + selectHtml;
+                container.appendChild(mealEl);
+            });
+        },
 
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.className = 'p-2 rounded-full hover:bg-gray-600 transition';
-                    deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>`;
-                    deleteBtn.onclick = () => this.showConfirmDeleteModal(meal.id, meal.name);
-
-                    controlsDiv.append(logBtn, editBtn, deleteBtn);
-                    return controlsDiv;
-                };
-
-                // Render categorized meals
-                if (mealsForCategory.length > 0) {
-                    const header = document.createElement('h3');
-                    header.className = 'text-sm font-semibold text-gray-400 px-2 mt-4 mb-2';
-                    header.textContent = `In ${currentMealCategory}`;
-                    listEl.appendChild(header);
-
-                    mealsForCategory.forEach(meal => {
-                        const mealEl = document.createElement('div');
-                        mealEl.className = 'bg-gray-700 p-4 rounded-lg flex justify-between items-center';
-                        
-                        const infoDiv = document.createElement('div');
-                        infoDiv.className = 'flex-grow';
-                        infoDiv.innerHTML = `<p class="font-semibold">${meal.name}</p><p class="text-sm text-gray-400">${meal.calories} kcal &bull; ${meal.protein}g protein</p>`;
-                        
-                        mealEl.appendChild(infoDiv);
-                        mealEl.appendChild(createControls(meal));
-                        listEl.appendChild(mealEl);
-                    });
+        handleUpdateMealCategory: async function(mealId, newCategory) {
+            if (!userId || !mealId) return;
+            const mealRef = doc(db, `artifacts/${appId}/users/${userId}/meals`, mealId);
+            try {
+                await updateDoc(mealRef, { category: newCategory });
+                // Update local state to avoid a full re-render from Firestore
+                const mealInState = allSavedMeals.find(m => m.id === mealId);
+                if (mealInState) {
+                    mealInState.category = newCategory;
                 }
+                showToast("Category updated!", "success");
+            } catch (error) {
+                console.error("Error updating meal category:", error);
+                showToast("Failed to update category.", "error");
+            }
+        },
+        
+            // REPLACE your old renderSavedMeals function with this one
+        renderSavedMeals: function(filter = '') {
+            const listEl = document.getElementById('saved-meals-list');
+            if (!listEl) return;
+            listEl.innerHTML = '';
 
-                // Render uncategorized meals
-                if (uncategorizedMeals.length > 0) {
-                    const header = document.createElement('h3');
-                    header.className = 'text-sm font-semibold text-gray-400 px-2 mt-6 mb-2';
-                    header.innerHTML = `From Your Library <span class="font-normal">(Tap to categorize & log)</span>`;
-                    listEl.appendChild(header);
+            const searchTerm = filter.toLowerCase();
+            const filteredMeals = allSavedMeals.filter(meal => 
+                meal.category === currentMealCategory && meal.name.toLowerCase().includes(searchTerm)
+            );
 
-                    uncategorizedMeals.forEach(meal => {
-                        const mealEl = document.createElement('div');
-                        mealEl.className = 'bg-gray-800 border border-dashed border-gray-600 p-4 rounded-lg';
-                        
-                        const infoDiv = document.createElement('div');
-                        infoDiv.innerHTML = `<p class="font-semibold">${meal.name}</p><p class="text-sm text-gray-400">${meal.calories} kcal &bull; ${meal.protein}g protein</p>`;
-                        
-                        const categorizeDiv = document.createElement('div');
-                        categorizeDiv.className = 'flex items-center justify-around gap-2 mt-3 pt-3 border-t border-gray-700';
-                        
-                        ['Breakfast', 'Lunch', 'Dinner', 'Snacks'].forEach(cat => {
-                            const btn = document.createElement('button');
-                            btn.className = 'text-xs font-bold bg-gray-700 hover:bg-indigo-600 rounded-full w-10 h-10 flex items-center justify-center transition';
-                            btn.textContent = cat[0];
-                            if (cat === 'Snacks') btn.textContent = 'S';
-                            btn.onclick = () => this.handleCategorizeAndLog(meal.id, cat);
-                            categorizeDiv.appendChild(btn);
-                        });
-                        
-                        mealEl.append(infoDiv, categorizeDiv);
-                        listEl.appendChild(mealEl);
-                    });
-                }
+            if (filteredMeals.length === 0) {
+                listEl.innerHTML = `<p class="text-gray-500 text-center py-4">No meals found in the '${currentMealCategory}' category. You can categorize them in Settings -> Meal Library.</p>`;
+                return;
+            }
 
-                // Handle empty state
-                if (listEl.innerHTML === '') {
-                    listEl.innerHTML = `<p class="text-gray-500 text-center py-4">No meals found. Add one!</p>`;
-                }
-            },
+            filteredMeals.forEach(meal => {
+                const mealEl = document.createElement('div');
+                mealEl.className = 'bg-gray-700 p-4 rounded-lg flex justify-between items-center';
+                mealEl.innerHTML = `
+                    <div class="flex-grow">
+                        <p class="font-semibold">${meal.name}</p>
+                        <p class="text-sm text-gray-400">${meal.calories} kcal &bull; ${meal.protein}g protein</p>
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <button class="log-meal-btn bg-indigo-600 p-2 rounded-full hover:bg-indigo-500 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                        </button>
+                    </div>
+                `;
+                mealEl.querySelector('.log-meal-btn').onclick = () => this.logMeal(meal, currentMealCategory);
+                listEl.appendChild(mealEl);
+            });
+        },
             
             handleGoogleSignIn: async function() {
                 const provider = new GoogleAuthProvider();
@@ -1305,7 +1308,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             app.initializeFirebase();
             document.getElementById('today-date-display').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-            
+            document.getElementById('manage-meals-btn').addEventListener('click', () => app.renderMealLibrary());
+             window.handleUpdateMealCategory = app.handleUpdateMealCategory.bind(app); // Make it available to the onchange attribute
             window.app = app;
             window.showPage = app.showPage.bind(app);
             window.showHistoryPage = app.showHistoryPage.bind(app);
