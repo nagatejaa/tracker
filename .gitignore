@@ -1,1 +1,4 @@
 h.txt
+.*
+firebase*
+functions/
