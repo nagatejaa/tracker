@@ -78,6 +78,7 @@
                     <div id="header-menu-dropdown" class="hidden absolute top-10 right-0 bg-gray-800 border border-gray-700 rounded-lg shadow-xl w-48 z-10">
                         <a href="#" onclick="showProfilePage(); closeHeaderMenu();" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-gray-700 rounded-t-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" /></svg>Profile</a>
                         <a href="#" onclick="showHistoryPage(); closeHeaderMenu();" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-gray-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>History</a>
+                        <a href="#" onclick="showMealLibraryPage(); closeHeaderMenu();" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-gray-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 16c1.255 0 2.443-.29 3.5-.804V4.804zM14.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 0114.5 16c1.255 0 2.443-.29 3.5-.804v-10A7.968 7.968 0 0014.5 4z" /></svg>Meal Library</a>
                         <a href="#" onclick="showGoalsPage(); closeHeaderMenu();" class="flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-gray-700 rounded-b-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>Settings</a>
                     </div>
                 </div>
@@ -142,13 +143,20 @@
                 <h2 class="text-xl font-semibold text-gray-200 border-b border-gray-700 pb-3">Account</h2>
                 <button id="sign-out-btn" class="w-full mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl transition-transform transform hover:scale-105">Sign Out</button>
             </div>
-            <div class="mt-6 bg-gray-800 p-6 rounded-2xl">
-            <h2 class="text-xl font-semibold text-gray-200 border-b border-gray-700 pb-3">Meal Library</h2>
-            <p class="text-sm text-gray-400 mt-3 mb-4">Organize all of your saved meals into categories here.</p>
-            <button id="manage-meals-btn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-xl">Manage My Meals</button>
-            <div id="meal-library-container" class="mt-4 space-y-3 hidden max-h-[50vh] overflow-y-auto pr-2">
-                </div>
         </div>
+
+        <div id="page-meal-library" class="page">
+            <header class="flex items-center mb-8">
+                <button onclick="showPage('page-dashboard')" class="mr-4 p-2 rounded-full hover:bg-gray-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                </button>
+                <h1 class="text-3xl font-bold text-gray-100">Meal Library</h1>
+            </header>
+            <div class="bg-gray-800 p-6 rounded-2xl">
+                 <p class="text-sm text-gray-400 mb-4">Manage all of your saved meals here. You can edit their details or delete them permanently.</p>
+                 <div id="meal-library-container" class="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
+                     </div>
+            </div>
         </div>
         
         <div id="page-history" class="page">
@@ -272,6 +280,16 @@
                  <div><label for="edit-meal-calories" class="block mb-2 text-sm font-medium text-gray-300">Calories (kcal)</label><input type="number" step="any" id="edit-meal-calories" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
                  <div><label for="edit-meal-protein" class="block mb-2 text-sm font-medium text-gray-300">Protein (g)</label><input type="number" step="any" id="edit-meal-protein" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
                  <div><label for="edit-meal-carbs" class="block mb-2 text-sm font-medium text-gray-300">Carbohydrates (g)</label><input type="number" step="any" id="edit-meal-carbs" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3"></div>
+                 <div>
+                    <label for="edit-meal-category" class="block mb-2 text-sm font-medium text-gray-300">Category</label>
+                    <select id="edit-meal-category" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full p-3">
+                        <option value="Uncategorized">Uncategorized</option>
+                        <option value="Breakfast">Breakfast</option>
+                        <option value="Lunch">Lunch</option>
+                        <option value="Dinner">Dinner</option>
+                        <option value="Snacks">Snacks</option>
+                    </select>
+                </div>
              </div>
              <div class="flex justify-end gap-3 mt-6">
                   <button onclick="hideEditMealModal()" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-500 text-white text-sm font-medium transition">Cancel</button>
@@ -393,7 +411,7 @@
         const app = {
             initializeFirebase: async function() {
                 try {
-                    if (firebaseConfig.apiKey === "YOUR_API_KEY") {
+                    if (!firebaseConfig.apiKey) {
                         document.getElementById('loading-spinner').innerHTML = `<div class="text-center text-red-400 p-4 max-w-sm"><strong>Configuration Error:</strong><br>Please get your own free Firebase configuration object and paste it into the HTML file to connect to the database.</div>`;
                         return;
                     }
@@ -711,94 +729,74 @@
                 document.getElementById('calories-out-goal').textContent = `Goal: ${goals.caloriesOut}`;
                 document.getElementById('protein-goal').textContent = `Goal: ${goals.protein}g`;
             },
-            // Add these two new functions inside the app = { ... } object
-        renderMealLibrary: function() {
-            const container = document.getElementById('meal-library-container');
-            container.innerHTML = ''; // Clear old content
-            container.classList.remove('hidden');
+            
+            renderMealLibrary: function() {
+                const container = document.getElementById('meal-library-container');
+                container.innerHTML = ''; // Clear old content
+                container.classList.remove('hidden');
 
-            if (allSavedMeals.length === 0) {
-                container.innerHTML = `<p class="text-gray-500 text-center py-4">Your library is empty. Add some meals!</p>`;
-                return;
-            }
-
-            allSavedMeals.forEach(meal => {
-                const mealEl = document.createElement('div');
-                mealEl.className = 'bg-gray-700 p-4 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3';
-                
-                const infoHtml = `
-                    <div>
-                        <p class="font-semibold">${meal.name}</p>
-                        <p class="text-sm text-gray-400">${meal.calories} kcal &bull; ${meal.protein}g protein</p>
-                    </div>
-                `;
-
-                const selectHtml = `
-                    <select onchange="app.handleUpdateMealCategory('${meal.id}', this.value)" class="bg-gray-800 border border-gray-600 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:w-auto p-2">
-                        <option value="Uncategorized" ${!meal.category || meal.category === 'Uncategorized' ? 'selected' : ''}>Uncategorized</option>
-                        <option value="Breakfast" ${meal.category === 'Breakfast' ? 'selected' : ''}>Breakfast</option>
-                        <option value="Lunch" ${meal.category === 'Lunch' ? 'selected' : ''}>Lunch</option>
-                        <option value="Dinner" ${meal.category === 'Dinner' ? 'selected' : ''}>Dinner</option>
-                        <option value="Snacks" ${meal.category === 'Snacks' ? 'selected' : ''}>Snacks</option>
-                    </select>
-                `;
-
-                mealEl.innerHTML = infoHtml + selectHtml;
-                container.appendChild(mealEl);
-            });
-        },
-
-        handleUpdateMealCategory: async function(mealId, newCategory) {
-            if (!userId || !mealId) return;
-            const mealRef = doc(db, `artifacts/${appId}/users/${userId}/meals`, mealId);
-            try {
-                await updateDoc(mealRef, { category: newCategory });
-                // Update local state to avoid a full re-render from Firestore
-                const mealInState = allSavedMeals.find(m => m.id === mealId);
-                if (mealInState) {
-                    mealInState.category = newCategory;
+                if (allSavedMeals.length === 0) {
+                    container.innerHTML = `<p class="text-gray-500 text-center py-4">Your library is empty. Add some meals!</p>`;
+                    return;
                 }
-                showToast("Category updated!", "success");
-            } catch (error) {
-                console.error("Error updating meal category:", error);
-                showToast("Failed to update category.", "error");
-            }
-        },
-        
-            // REPLACE your old renderSavedMeals function with this one
-        renderSavedMeals: function(filter = '') {
-            const listEl = document.getElementById('saved-meals-list');
-            if (!listEl) return;
-            listEl.innerHTML = '';
 
-            const searchTerm = filter.toLowerCase();
-            const filteredMeals = allSavedMeals.filter(meal => 
-                meal.category === currentMealCategory && meal.name.toLowerCase().includes(searchTerm)
-            );
+                allSavedMeals.sort((a, b) => a.name.localeCompare(b.name)).forEach(meal => {
+                    const mealEl = document.createElement('div');
+                    mealEl.className = 'bg-gray-700 p-3 rounded-lg flex justify-between items-center gap-3 animate-fade-in';
+                    
+                    const mealNameForJs = meal.name.replace(/'/g, "\\'"); // Escape single quotes for JS string
 
-            if (filteredMeals.length === 0) {
-                listEl.innerHTML = `<p class="text-gray-500 text-center py-4">No meals found in the '${currentMealCategory}' category. You can categorize them in Settings -> Meal Library.</p>`;
-                return;
-            }
+                    mealEl.innerHTML = `
+                        <div class="flex-grow min-w-0">
+                            <p class="font-semibold truncate">${meal.name}</p>
+                            <p class="text-sm text-gray-400">${meal.calories} kcal &bull; ${meal.protein}g protein &bull; <span class="capitalize">${meal.category || 'Uncategorized'}</span></p>
+                        </div>
+                        <div class="flex-shrink-0 flex items-center gap-2">
+                            <button onclick="app.handleShowEditModal('${meal.id}')" class="p-2 rounded-full hover:bg-gray-600 transition" aria-label="Edit meal">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-sky-400" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
+                            </button>
+                            <button onclick="app.showConfirmDeleteModal('${meal.id}', '${mealNameForJs}')" class="p-2 rounded-full hover:bg-gray-600 transition" aria-label="Delete meal">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg>
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(mealEl);
+                });
+            },
 
-            filteredMeals.forEach(meal => {
-                const mealEl = document.createElement('div');
-                mealEl.className = 'bg-gray-700 p-4 rounded-lg flex justify-between items-center';
-                mealEl.innerHTML = `
-                    <div class="flex-grow">
-                        <p class="font-semibold">${meal.name}</p>
-                        <p class="text-sm text-gray-400">${meal.calories} kcal &bull; ${meal.protein}g protein</p>
-                    </div>
-                    <div class="flex items-center gap-2 flex-shrink-0">
-                        <button class="log-meal-btn bg-indigo-600 p-2 rounded-full hover:bg-indigo-500 transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
-                        </button>
-                    </div>
-                `;
-                mealEl.querySelector('.log-meal-btn').onclick = () => this.logMeal(meal, currentMealCategory);
-                listEl.appendChild(mealEl);
-            });
-        },
+            renderSavedMeals: function(filter = '') {
+                const listEl = document.getElementById('saved-meals-list');
+                if (!listEl) return;
+                listEl.innerHTML = '';
+
+                const searchTerm = filter.toLowerCase();
+                const filteredMeals = allSavedMeals.filter(meal => 
+                    meal.category === currentMealCategory && meal.name.toLowerCase().includes(searchTerm)
+                );
+
+                if (filteredMeals.length === 0) {
+                    listEl.innerHTML = `<p class="text-gray-500 text-center py-4">No meals found in the '${currentMealCategory}' category. You can add one below or categorize existing meals in the Meal Library.</p>`;
+                    return;
+                }
+
+                filteredMeals.forEach(meal => {
+                    const mealEl = document.createElement('div');
+                    mealEl.className = 'bg-gray-700 p-4 rounded-lg flex justify-between items-center';
+                    mealEl.innerHTML = `
+                        <div class="flex-grow">
+                            <p class="font-semibold">${meal.name}</p>
+                            <p class="text-sm text-gray-400">${meal.calories} kcal &bull; ${meal.protein}g protein</p>
+                        </div>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            <button class="log-meal-btn bg-indigo-600 p-2 rounded-full hover:bg-indigo-500 transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                            </button>
+                        </div>
+                    `;
+                    mealEl.querySelector('.log-meal-btn').onclick = () => this.logMeal(meal, currentMealCategory);
+                    listEl.appendChild(mealEl);
+                });
+            },
             
             handleGoogleSignIn: async function() {
                 const provider = new GoogleAuthProvider();
@@ -849,7 +847,7 @@
                 suggestionsContainer.innerHTML = '';
 
                 // ❗ PASTE YOUR GOOGLE GEMINI API KEY HERE ❗
-                const apiKey = "AIzaSyB60IW9zOwwZPlngrSjQzoh2gSNo5xkP3g"; 
+                const apiKey = "AIzaSyBRJDYe1PP9mex1loKyD_WronmoLjZeYKo"; 
 
                 if (apiKey === "") {
                     showToast("Gemini API key is missing in the code.", "error");
@@ -918,7 +916,7 @@
                 btnText.textContent = "Analyzing...";
                 iconLoading.style.display = 'block';
 
-                const apiKey = "AIzaSyB60IW9zOwwZPlngrSjQzoh2gSNo5xkP3g"; // ❗ PASTE YOUR GOOGLE GEMINI API KEY HERE TOO ❗
+                const apiKey = "AIzaSyBRJDYe1PP9mex1loKyD_WronmoLjZeYKo"; // ❗ PASTE YOUR GOOGLE GEMINI API KEY HERE TOO ❗
 
                 if (apiKey === "") {
                      showToast("Gemini API key is missing in the code.", "error");
@@ -979,7 +977,7 @@
                 iconLoading.style.display = 'block';
                 responseEl.innerHTML = `<div class="flex justify-center items-center h-full"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-400"></div></div>`;
 
-                const apiKey = ""; // ❗ PASTE YOUR GOOGLE GEMINI API KEY HERE THREE ❗
+                const apiKey = "AIzaSyBRJDYe1PP9mex1loKyD_WronmoLjZeYKo"; // ❗ PASTE YOUR GOOGLE GEMINI API KEY HERE THREE ❗
 
                 if (apiKey === "") {
                     responseEl.textContent = "Error: Gemini API key is missing in the code.";
@@ -1056,23 +1054,6 @@
                     await setDoc(logRef, { loggedMeals: [mealToLog], loggedActivities: [] });
                 }
                 showToast(`${mealData.name} logged!`, 'success');
-            },
-            handleCategorizeAndLog: async function(mealId, newCategory) {
-                const mealData = allSavedMeals.find(m => m.id === mealId);
-                if (!mealData) {
-                    showToast("Error finding meal.", "error");
-                    return;
-                }
-                
-                try {
-                    const mealRef = doc(db, `artifacts/${appId}/users/${userId}/meals`, mealId);
-                    await updateDoc(mealRef, { category: newCategory });
-                    await this.logMeal(mealData, newCategory);
-                    showToast(`'${mealData.name}' categorized as ${newCategory} and logged.`, 'success');
-                } catch (error) {
-                    console.error("Error categorizing and logging meal: ", error);
-                    showToast("Operation failed.", "error");
-                }
             },
             handleSaveActivity: async function() {
                 const dateString = document.getElementById('log-activity-date-picker').value;
@@ -1171,19 +1152,22 @@
                     name: document.getElementById('edit-meal-name').value.trim(),
                     calories: parseFloat(document.getElementById('edit-meal-calories').value) || 0,
                     protein: parseFloat(document.getElementById('edit-meal-protein').value) || 0,
-                    carbs: parseFloat(document.getElementById('edit-meal-carbs').value) || 0
+                    carbs: parseFloat(document.getElementById('edit-meal-carbs').value) || 0,
+                    category: document.getElementById('edit-meal-category').value
                 };
                 if (!updatedMeal.name) { showToast('Meal name required.', 'error'); return; }
                 const mealRef = doc(db, `artifacts/${appId}/users/${userId}/meals`, mealId);
                 await updateDoc(mealRef, updatedMeal);
                 showToast("Meal updated!", "success");
                 this.hideEditMealModal();
+                this.renderMealLibrary(); // Re-render library to show changes
             },
             deleteMeal: async function(mealId) {
                 const mealRef = doc(db, `artifacts/${appId}/users/${userId}/meals`, mealId);
                 await deleteDoc(mealRef);
                 showToast("Meal deleted from library.", "success");
                 this.hideConfirmDeleteModal();
+                this.renderMealLibrary(); // Re-render library to show changes
             },
             
             showPage: function(pageId) {
@@ -1257,12 +1241,19 @@
             },
             hideActivityModal: function() { document.getElementById('activity-modal-backdrop').classList.remove('active'); document.getElementById('activity-modal').classList.remove('active'); },
             
+            handleShowEditModal: function(mealId) {
+                const meal = allSavedMeals.find(m => m.id === mealId);
+                if (meal) {
+                    this.showEditMealModal(meal);
+                }
+            },
             showEditMealModal: function(meal) {
                 document.getElementById('edit-meal-id').value = meal.id;
                 document.getElementById('edit-meal-name').value = meal.name;
                 document.getElementById('edit-meal-calories').value = meal.calories;
                 document.getElementById('edit-meal-protein').value = meal.protein;
                 document.getElementById('edit-meal-carbs').value = meal.carbs;
+                document.getElementById('edit-meal-category').value = meal.category || 'Uncategorized';
                 document.getElementById('edit-meal-modal-backdrop').classList.add('active');
                 document.getElementById('edit-meal-modal').classList.add('active');
             },
@@ -1308,13 +1299,16 @@
         document.addEventListener('DOMContentLoaded', () => {
             app.initializeFirebase();
             document.getElementById('today-date-display').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-            document.getElementById('manage-meals-btn').addEventListener('click', () => app.renderMealLibrary());
-             window.handleUpdateMealCategory = app.handleUpdateMealCategory.bind(app); // Make it available to the onchange attribute
+            
             window.app = app;
             window.showPage = app.showPage.bind(app);
             window.showHistoryPage = app.showHistoryPage.bind(app);
             window.showProfilePage = () => app.showPage('page-profile');
             window.showGoalsPage = () => app.showPage('page-goals');
+            window.showMealLibraryPage = () => {
+                app.renderMealLibrary();
+                app.showPage('page-meal-library');
+            };
             window.showMealLoggingPage = app.showMealLoggingPage.bind(app);
             window.showActivityModal = app.showActivityModal.bind(app);
             window.hideActivityModal = app.hideActivityModal.bind(app);
